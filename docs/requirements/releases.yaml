@@ -1,0 +1,27 @@
+schema_version: 1
+releases:
+  - id: M0
+    name: Foundation
+    gate: G0
+    prohibited: [real-client-data, legal-workflows, payments, public-launch, ai]
+  - id: M1
+    name: Identity and authorization
+    gate: G1
+  - id: M2-M3
+    name: Intake, conflict, and engagement
+    gate: G2
+  - id: M4-M6
+    name: Matters, deadlines, documents, and evidence
+    gate: G3
+  - id: M7
+    name: Client portal
+    gate: G4
+  - id: M8-M10
+    name: Finance, integrations, and hardening
+    gate: G5
+  - id: M9
+    name: Privacy and records
+    gate: G6
+  - id: M11
+    name: Controlled AI
+    gate: G7

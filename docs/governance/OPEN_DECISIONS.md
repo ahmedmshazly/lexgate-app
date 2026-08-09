@@ -1,0 +1,16 @@
+# Open Decision Register
+
+**Document ID:** LG-GOV-002  
+**Status:** Active  
+**Owner:** Project Sponsor
+
+| ID      | Decision                                                                              | Owner                                 | Gate                                               | Safe interim position                                           |
+| ------- | ------------------------------------------------------------------------------------- | ------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------- |
+| ODR-001 | Lex Gate legal entity, registrations, tax identity, and authorized signatories        | Sponsor + Egyptian counsel            | Before public contracting or invoicing             | No generated legal or tax documents.                            |
+| ODR-002 | Professional authority matrix and Bar/public-marketing interpretation                 | Lead practising Egyptian lawyer       | Before public website or legal workflow activation | No outcome claims; lawyer approval required.                    |
+| ODR-003 | Privacy licensing, DPO, sensitive-data, and transfer position                         | Privacy reviewer                      | Before production personal-data processing         | Local-only synthetic development data.                          |
+| ODR-004 | Practice areas, matter taxonomy, volumes, current tools, and migration sources        | Product / legal-operations lead       | Before M2–M6                                       | No irreversible domain or migration assumptions.                |
+| ODR-005 | Cloud, region, identity, storage, search, queue, monitoring, and WAF vendors          | Architecture + security leads         | Before production environment                      | Local PostgreSQL/MinIO and provider interfaces only.            |
+| ODR-006 | ETA, payment, signature, SMS, email, WhatsApp, and court/government integration paths | Finance / legal / architecture owners | Before each provider feature                       | Manual process and adapter contracts only.                      |
+| ODR-007 | Signature level by document type and legal-rule formulae                              | Egyptian lawyer                       | Before activation                                  | No claim of legal signature or automatic deadline confirmation. |
+| ODR-008 | AI provider, permitted use cases, and data-processing terms                           | Legal, privacy, security, sponsor     | Before AI milestone                                | AI unavailable.                                                 |

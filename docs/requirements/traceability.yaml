@@ -1,0 +1,122 @@
+schema_version: 1
+traceability:
+  - requirement: ARC-MOD-001
+    architecture: [ADR-001]
+    implementation: [packages/domain, packages/application]
+    evidence: [architecture:dependency-boundaries]
+    gate: G0
+  - requirement: ARC-OUT-001
+    architecture: [ADR-006]
+    implementation: [packages/events, apps/worker]
+    evidence: [integration:outbox-atomicity]
+    gate: G0
+  - requirement: INT-ADP-001
+    architecture: [ADR-007]
+    implementation: [packages/integrations]
+    evidence: [architecture:adapter-boundary]
+    gate: G0
+  - requirement: I18N-RTL-001
+    architecture: [LG-BRAND-001]
+    implementation: [apps/web, packages/localization, packages/ui]
+    evidence: [e2e:locale-shell]
+    gate: G0
+  - requirement: SEC-AUT-001
+    architecture: [ADR-005]
+    implementation: [packages/auth, packages/application]
+    evidence: [security:negative-authorization]
+    gate: G1
+  - requirement: SEC-MAT-001
+    architecture: [ADR-009]
+    implementation: [packages/auth, packages/domain]
+    evidence: [security:matter-isolation]
+    gate: G1
+  - requirement: DAT-PRT-001
+    architecture: [LG-DOM-001]
+    implementation: [packages/domain]
+    evidence: [domain:party-model]
+    gate: G2
+  - requirement: LEG-CFL-001
+    architecture: [LG-DOM-001]
+    implementation: [packages/domain]
+    evidence: [domain:conflict-opening]
+    gate: G2
+  - requirement: LEG-CFL-004
+    architecture: [LG-DOM-001]
+    implementation: [packages/domain]
+    evidence: [domain:conflict-review]
+    gate: G2
+  - requirement: LEG-ENG-001
+    architecture: [LG-DOM-001]
+    implementation: [packages/domain, packages/application]
+    evidence: [domain:engagement-activation]
+    gate: G2
+  - requirement: LEG-MAT-002
+    architecture: [LG-DOM-001]
+    implementation: [packages/domain]
+    evidence: [domain:matter-proceeding]
+    gate: G3
+  - requirement: LEG-DLN-001
+    architecture: [LG-DOM-001]
+    implementation: [packages/domain]
+    evidence: [domain:deadline-confirmation]
+    gate: G3
+  - requirement: LEG-RUL-001
+    architecture: [LG-DOM-001, ADR-010]
+    implementation: [packages/domain]
+    evidence: [domain:rule-versioning]
+    gate: G3
+  - requirement: REC-DOC-001
+    architecture: [ADR-003, ADR-010]
+    implementation: [packages/domain, packages/database]
+    evidence: [domain:document-provenance]
+    gate: G3
+  - requirement: REC-EVD-001
+    architecture: [LG-DOM-001, ADR-010]
+    implementation: [packages/domain, packages/database]
+    evidence: [domain:evidence-custody]
+    gate: G3
+  - requirement: SEC-STO-001
+    architecture: [ADR-003]
+    implementation: [packages/integrations, packages/database]
+    evidence: [security:private-storage]
+    gate: G3
+  - requirement: UX-PRT-001
+    architecture: [ADR-004]
+    implementation: [apps/web, packages/application]
+    evidence: [security:portal-projection]
+    gate: G4
+  - requirement: COM-NOT-001
+    architecture: [LG-DOM-001]
+    implementation: [packages/domain, packages/application]
+    evidence: [domain:communication-delivery]
+    gate: G4
+  - requirement: FIN-PAY-001
+    architecture: [ADR-007]
+    implementation: [packages/integrations, packages/domain]
+    evidence: [integration:payment-reconciliation]
+    gate: G5
+  - requirement: PRV-MIN-001
+    architecture: [LG-PRV-001]
+    implementation: [packages/domain, apps/web]
+    evidence: [privacy:collection-inventory]
+    gate: G6
+  - requirement: REC-HLD-001
+    architecture: [ADR-010]
+    implementation: [packages/domain]
+    evidence: [domain:legal-hold]
+    gate: G6
+  - requirement: AI-GOV-001
+    architecture: [ADR-008]
+    implementation: [packages/integrations]
+    evidence: [security:ai-disabled]
+    gate: G7
+  - requirement: QLT-TRC-001
+    architecture: [LG-QA-001]
+    implementation: [tools/validate-docs.ts]
+    evidence: [docs:requirements-schema]
+    gate: G0
+  - requirement: QLT-EVD-001
+    architecture: [LG-DEV-002]
+    implementation: [CONSTITUTION.md, docs/development]
+    evidence: [docs:quality-engineering-standard]
+    gate: G0

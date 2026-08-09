@@ -1,0 +1,305 @@
+schema_version: 1
+project: lex-gate
+authority: LG-SRS-001
+requirements:
+  - id: ARC-MOD-001
+    title: Modular monolith boundary
+    statement: The platform shall use a modular monolith with domain rules independent from framework and provider code.
+    priority: P0
+    status: approved
+    owner: architecture
+    release: M0
+    sources: [LG-SRS-001, ADR-001]
+    acceptance:
+      [
+        domain package has no Next.js or provider imports,
+        dependency check passes,
+      ]
+    tests: [architecture:dependency-boundaries]
+    legal_validation: not_required
+  - id: SEC-AUT-001
+    title: Server-side object authorization
+    statement: Every protected resource operation shall perform server-side, deny-by-default object authorization.
+    priority: P0
+    status: approved
+    owner: security
+    release: M1
+    sources: [LG-SRS-001, ADR-005]
+    acceptance:
+      [
+        unauthorized reads and mutations are denied,
+        authorization is not delegated to the browser,
+      ]
+    tests: [security:negative-authorization]
+    legal_validation: not_required
+  - id: SEC-MAT-001
+    title: Matter access separation
+    statement: Employment, technical administration, or a system role shall not by itself grant matter access.
+    priority: P0
+    status: approved
+    owner: security
+    release: M1
+    sources: [LG-SRS-001, ADR-009]
+    acceptance:
+      [access requires an explicit relationship or approved break-glass flow]
+    tests: [security:matter-isolation]
+    legal_validation: required
+  - id: DAT-PRT-001
+    title: Party identity model
+    statement: The platform shall model people, organizations, names, aliases, contact points, and representation independently of matter state.
+    priority: P1
+    status: proposed
+    owner: product
+    release: M2
+    sources: [LG-SRS-001, D10-gap]
+    acceptance: [Arabic and English aliases can be stored with provenance]
+    tests: [domain:party-model]
+    legal_validation: required
+  - id: LEG-CFL-001
+    title: Conflict before standard matter opening
+    statement: A standard matter shall not open until conflict review reaches an approved state.
+    priority: P0
+    status: proposed
+    owner: legal_operations
+    release: M3
+    sources: [LG-D03, LG-D08]
+    acceptance:
+      [
+        open command rejects incomplete conflict review,
+        exception is separately audited,
+      ]
+    tests: [domain:conflict-opening]
+    legal_validation: required
+  - id: LEG-CFL-004
+    title: Human conflict assessment
+    statement: A conflict result shall not be automatically cleared solely because an exact string match is absent.
+    priority: P0
+    status: proposed
+    owner: legal_operations
+    release: M3
+    sources: [LG-D03]
+    acceptance: [candidate matches require authorized reviewer disposition]
+    tests: [domain:conflict-review]
+    legal_validation: required
+  - id: LEG-ENG-001
+    title: Engagement separation
+    statement: Payment, consultation, and enquiry shall not by themselves establish an engagement or representation.
+    priority: P0
+    status: approved
+    owner: legal_operations
+    release: M3
+    sources: [LG-SRS-001]
+    acceptance: [engagement activation is an explicit audited command]
+    tests: [domain:engagement-activation]
+    legal_validation: required
+  - id: LEG-MAT-002
+    title: Matter and proceeding separation
+    statement: Matter and proceeding shall remain separate concepts with independently controlled states.
+    priority: P1
+    status: approved
+    owner: architecture
+    release: M4
+    sources: [LG-SRS-001]
+    acceptance: [a matter can have zero or more proceedings]
+    tests: [domain:matter-proceeding]
+    legal_validation: required
+  - id: LEG-DLN-001
+    title: Confirmed legal deadlines
+    statement: Calculated legal deadlines shall be provisional until the required authorized review confirms them.
+    priority: P0
+    status: proposed
+    owner: legal_operations
+    release: M5
+    sources: [LG-SRS-001, LG-D08]
+    acceptance:
+      [
+        calculation,
+        source rule,
+        reviewer,
+        and confirmation are recorded separately,
+      ]
+    tests: [domain:deadline-confirmation]
+    legal_validation: required
+  - id: LEG-RUL-001
+    title: Versioned legal rules
+    statement: Procedural, retention, and authority rules shall be source-linked, effective-dated, versioned, and reviewer-approved.
+    priority: P0
+    status: approved
+    owner: legal_operations
+    release: M5
+    sources: [LG-SRS-001, ADR-010]
+    acceptance: [active rule selection is reproducible for an effective date]
+    tests: [domain:rule-versioning]
+    legal_validation: required
+  - id: REC-DOC-001
+    title: Document version model
+    statement: Document, version, and file object shall be separate entities with immutable provenance.
+    priority: P0
+    status: approved
+    owner: records
+    release: M6
+    sources: [LG-SRS-001, ADR-003, ADR-010]
+    acceptance: [final versions cannot be silently overwritten]
+    tests: [domain:document-provenance]
+    legal_validation: required
+  - id: REC-EVD-001
+    title: Evidence classification
+    statement: Evidence status and custody shall be distinct from ordinary document storage.
+    priority: P0
+    status: proposed
+    owner: records
+    release: M6
+    sources: [LG-D12, LG-SRS-001]
+    acceptance: [custody events are append-only and attributable]
+    tests: [domain:evidence-custody]
+    legal_validation: required
+  - id: SEC-STO-001
+    title: Confidential object storage
+    statement: Confidential material shall use private object storage with explicit authorized delivery paths.
+    priority: P0
+    status: approved
+    owner: security
+    release: M6
+    sources: [LG-SRS-001, ADR-003]
+    acceptance: [no public bucket or direct public object URL exists]
+    tests: [security:private-storage]
+    legal_validation: not_required
+  - id: UX-PRT-001
+    title: Client projection boundary
+    statement: Client-facing APIs shall return dedicated projections and shall never depend on browser-side field removal.
+    priority: P0
+    status: approved
+    owner: architecture
+    release: M7
+    sources: [LG-SRS-001, ADR-004]
+    acceptance:
+      [projection contract excludes internal strategy and restricted metadata]
+    tests: [security:portal-projection]
+    legal_validation: required
+  - id: COM-NOT-001
+    title: Communication evidence
+    statement: Material client communication shall record channel, sender, recipient, delivery state, and related event.
+    priority: P1
+    status: proposed
+    owner: legal_operations
+    release: M7
+    sources: [LG-D03, LG-D07]
+    acceptance:
+      [delivery failure cannot be represented as client notice completion]
+    tests: [domain:communication-delivery]
+    legal_validation: required
+  - id: FIN-PAY-001
+    title: Payment separation
+    statement: Provider payment state shall not directly create an engagement, matter, or legal conclusion.
+    priority: P0
+    status: approved
+    owner: finance
+    release: M8
+    sources: [LG-SRS-001]
+    acceptance:
+      [
+        payment callbacks require idempotent reconciliation and explicit domain handling,
+      ]
+    tests: [integration:payment-reconciliation]
+    legal_validation: required
+  - id: PRV-MIN-001
+    title: Data minimization
+    statement: Collection shall be purpose-specific and limited to data needed for the approved workflow.
+    priority: P0
+    status: proposed
+    owner: privacy
+    release: M9
+    sources: [LG-D12]
+    acceptance:
+      [
+        every sensitive form field has purpose,
+        classification,
+        and retention rationale,
+      ]
+    tests: [privacy:collection-inventory]
+    legal_validation: required
+  - id: REC-HLD-001
+    title: Legal hold precedence
+    statement: An active legal hold shall prevent ordinary retention destruction until released by authorized process.
+    priority: P0
+    status: approved
+    owner: records
+    release: M9
+    sources: [LG-SRS-001]
+    acceptance: [destruction command rejects held records]
+    tests: [domain:legal-hold]
+    legal_validation: required
+  - id: ARC-OUT-001
+    title: Transactional outbox
+    statement: External side effects shall be emitted through a transactional outbox or equivalent atomic delivery record.
+    priority: P0
+    status: approved
+    owner: architecture
+    release: M0
+    sources: [LG-SRS-001, ADR-006]
+    acceptance: [state change and outbox record commit atomically]
+    tests: [integration:outbox-atomicity]
+    legal_validation: not_required
+  - id: INT-ADP-001
+    title: Provider adapters
+    statement: External providers shall be isolated behind typed adapters, verified callbacks, idempotency, and reconciliation.
+    priority: P0
+    status: approved
+    owner: architecture
+    release: M0
+    sources: [LG-SRS-001, ADR-007]
+    acceptance: [domain packages do not import provider SDKs]
+    tests: [architecture:adapter-boundary]
+    legal_validation: not_required
+  - id: AI-GOV-001
+    title: AI unavailable by default
+    statement: AI features shall remain disabled until the controlled AI release gate passes.
+    priority: P0
+    status: approved
+    owner: security
+    release: M11
+    sources: [LG-SRS-001, ADR-008]
+    acceptance: [no AI provider credentials or UI path exists before G7]
+    tests: [security:ai-disabled]
+    legal_validation: required
+  - id: I18N-RTL-001
+    title: Arabic and RTL foundation
+    statement: The application shell shall support English and Arabic with correct direction, language, and mixed-script rendering.
+    priority: P0
+    status: approved
+    owner: design
+    release: M0
+    sources: [LG-SRS-001, LG-BRAND-001]
+    acceptance:
+      [
+        English and Arabic routes render semantic lang/dir attributes and pass RTL smoke checks,
+      ]
+    tests: [e2e:locale-shell]
+    legal_validation: not_required
+  - id: QLT-TRC-001
+    title: Requirement traceability
+    statement: Every material requirement shall identify source, owner, release, acceptance evidence, and validation state.
+    priority: P0
+    status: approved
+    owner: quality
+    release: M0
+    sources: [LG-SRS-001]
+    acceptance: [requirements validator rejects incomplete P0 records]
+    tests: [docs:requirements-schema]
+    legal_validation: not_required
+  - id: QLT-EVD-001
+    title: Consistent quality evidence
+    statement: Every material delivery shall retain a spec-anchored verification record, execute every applicable risk-based test layer, and block or escalate rather than lower quality requirements when capability or evidence is insufficient.
+    priority: P0
+    status: approved
+    owner: quality
+    release: M0
+    sources: [LG-SRS-001, LG-QA-001, LG-DEV-002]
+    acceptance:
+      [
+        material feature verification records map requirements to executed evidence,
+        omitted test layers have a rationale,
+        and missing required evidence prevents completion,
+      ]
+    tests: [docs:quality-engineering-standard]
+    legal_validation: not_required

@@ -1,0 +1,42 @@
+schema_version: 1
+capabilities:
+  - id: CAP-FOUNDATION
+    title: Controlled engineering foundation
+    release: M0
+    requirements:
+      [
+        ARC-MOD-001,
+        ARC-OUT-001,
+        INT-ADP-001,
+        I18N-RTL-001,
+        QLT-TRC-001,
+        QLT-EVD-001,
+      ]
+  - id: CAP-AUTHORIZATION
+    title: Identity and contextual authorization
+    release: M1
+    requirements: [SEC-AUT-001, SEC-MAT-001]
+  - id: CAP-LEGAL-OPERATIONS
+    title: Intake through records operations
+    release: M2-M6
+    requirements:
+      [
+        DAT-PRT-001,
+        LEG-CFL-001,
+        LEG-CFL-004,
+        LEG-ENG-001,
+        LEG-MAT-002,
+        LEG-DLN-001,
+        LEG-RUL-001,
+        REC-DOC-001,
+        REC-EVD-001,
+        SEC-STO-001,
+      ]
+  - id: CAP-CLIENT-PORTAL
+    title: Secure client collaboration
+    release: M7
+    requirements: [UX-PRT-001, COM-NOT-001]
+  - id: CAP-GOVERNANCE
+    title: Finance, privacy, records, and controlled AI
+    release: M8-M11
+    requirements: [FIN-PAY-001, PRV-MIN-001, REC-HLD-001, AI-GOV-001]

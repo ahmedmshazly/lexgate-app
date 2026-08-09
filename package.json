@@ -1,0 +1,43 @@
+{
+  "name": "lexgate",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.13.1",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "turbo dev --parallel",
+    "dev:web": "pnpm --filter @lexgate/web dev",
+    "dev:worker": "pnpm --filter @lexgate/worker dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "docs:validate": "tsx tools/validate-docs.ts",
+    "db:generate": "pnpm --filter @lexgate/database db:generate",
+    "db:migrate": "pnpm --filter @lexgate/database db:migrate",
+    "services:up": "docker compose -f infrastructure/compose/docker-compose.yml up -d",
+    "services:down": "docker compose -f infrastructure/compose/docker-compose.yml down",
+    "e2e": "playwright test",
+    "verify": "pnpm format:check && pnpm docs:validate && pnpm lint && pnpm typecheck && pnpm test",
+    "verify:full": "pnpm verify && pnpm build && pnpm e2e"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^22.15.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
+    "eslint": "^9.34.0",
+    "eslint-config-next": "^16.0.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.5",
+    "turbo": "^2.5.6",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4",
+    "yaml": "^2.8.1"
+  }
+}

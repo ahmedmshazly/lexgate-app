@@ -1,0 +1,19 @@
+:root {
+  --lg-navy-950: #0a1524;
+  --lg-navy-900: #0e1c30;
+  --lg-navy-800: #14263f;
+  --lg-gold-700: #a07c2a;
+  --lg-gold-600: #b8913c;
+  --lg-gold-300: #dcc287;
+  --lg-ink: #16171b;
+  --lg-slate: #4a4e56;
+  --lg-ivory: #f7f3ea;
+  --lg-warm-white: #fcfaf6;
+  --lg-border: #e4ded2;
+  --lg-confidential: #59304f;
+  --lg-restricted: #42284a;
+  --lg-success: #2f5d4a;
+  --lg-warning: #8a6a22;
+  --lg-critical: #7a2b2b;
+  --lg-radius: 0.5rem;
+}

@@ -1,0 +1,18 @@
+schema_version: 1
+validations:
+  - id: VAL-LEGAL-001
+    scope: professional authority, conflict, engagement, deadline, public content
+    reviewer: Lead practising Egyptian lawyer
+    status: required
+  - id: VAL-PRIVACY-001
+    scope: processing, data subject rights, sensitive data, transfer, retention
+    reviewer: Privacy/DPO reviewer
+    status: required
+  - id: VAL-FINANCE-001
+    scope: tax, ETA, invoice, payment, receipt, reconciliation
+    reviewer: Finance owner and Egyptian tax adviser
+    status: required
+  - id: VAL-SECURITY-001
+    scope: authorization, threat model, production access, penetration testing
+    reviewer: Security lead
+    status: required
