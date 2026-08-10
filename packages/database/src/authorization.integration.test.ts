@@ -312,7 +312,17 @@ describe("PostgreSQL restricted-resource authorization", () => {
 
   it("denies cross-organization, mismatched, missing-membership, and unavailable-emergency requests without enumeration", async () => {
     await fixture.seedMembership();
-    const crossOrganization = fixture.request();
+    await fixture.seedExactGrant();
+
+    // A genuinely different organization. Asking for the same actor and the
+    // same resource under an organization they hold no relationship in must
+    // deny, even though their own organization would allow it. This
+    // previously reused the fixture's own organization, so it re-tested the
+    // role-only case under a cross-organization name.
+    const crossOrganization = {
+      ...fixture.request(),
+      organizationId: `synthetic-other-organization-${crypto.randomUUID()}`,
+    };
 
     await expect(authorization.evaluate(crossOrganization)).resolves.toEqual({
       outcome: "denied",
@@ -329,7 +339,6 @@ describe("PostgreSQL restricted-resource authorization", () => {
       reason: "not_authorized",
     });
 
-    await fixture.seedExactGrant();
     const mismatchedResource = {
       ...fixture.request(),
       resource: {
@@ -463,6 +472,37 @@ describe("PostgreSQL restricted-resource authorization", () => {
 
     expect(retainedEvidence).toHaveLength(0);
     expect(retainedGrants).toHaveLength(1);
+  });
+
+  it("ignores a browser permission assertion in both directions (SC-002)", async () => {
+    // Pairing the flag with an empty grant set proves nothing: the request
+    // would be denied identically with the field deleted. The claim that a
+    // browser assertion cannot create access only holds if the flag changes
+    // no outcome either way.
+    const asserted = { ...fixture.request(), browserPermissionAssertion: true };
+    await expect(authorization.evaluate(asserted)).resolves.toEqual({
+      outcome: "denied",
+      reason: "not_authorized",
+    });
+
+    await fixture.seedMembership();
+    await fixture.seedExactGrant();
+
+    const allowedWithAssertion = {
+      ...fixture.request(),
+      browserPermissionAssertion: true,
+    };
+    const allowedWithout = fixture.request();
+
+    // The flag must not create access, and must not withhold it either — an
+    // inert field, not a second authority input.
+    await expect(authorization.evaluate(allowedWithAssertion)).resolves.toEqual(
+      { outcome: "allowed", reason: "explicit_relationship" },
+    );
+    await expect(authorization.evaluate(allowedWithout)).resolves.toEqual({
+      outcome: "allowed",
+      reason: "explicit_relationship",
+    });
   });
 
   it("freezes new legacy relationship writes so access cannot bypass the lifecycle ledger", async () => {
