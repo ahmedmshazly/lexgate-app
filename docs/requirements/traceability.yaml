@@ -137,7 +137,13 @@ traceability:
     gate: G5
   - requirement: PRV-MIN-001
     architecture: [LG-PRV-001]
-    implementation: [packages/domain, apps/web, specs/004-gate-readiness]
+    implementation:
+      [
+        packages/domain,
+        packages/observability,
+        apps/web,
+        specs/004-gate-readiness,
+      ]
     evidence: [privacy:collection-inventory]
     gate: G6
   - requirement: REC-HLD-001
