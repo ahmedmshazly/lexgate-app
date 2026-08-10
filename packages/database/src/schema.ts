@@ -553,3 +553,77 @@ export const partyIdentityAuditEvents = pgTable(
     }),
   ],
 );
+
+/**
+ * Append-only ledger of every legal hold placement and release. A release is a
+ * successor event; a placement is never edited to represent release.
+ */
+export const legalHoldEvents = pgTable(
+  "legal_hold_events",
+  {
+    id: uuid("id").primaryKey(),
+    holdId: uuid("hold_id").notNull(),
+    organizationId: text("organization_id").notNull(),
+    resourceType: text("resource_type").notNull(),
+    resourceId: text("resource_id").notNull(),
+    eventType: text("event_type").notNull(),
+    priorRevision: integer("prior_revision"),
+    revision: integer("revision").notNull(),
+    operatorAccountId: text("operator_account_id").notNull(),
+    reasonCode: text("reason_code").notNull(),
+    correlationId: text("correlation_id").notNull(),
+    occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull(),
+  },
+  (table) => [
+    unique("legal_hold_events_revision_unique").on(
+      table.holdId,
+      table.revision,
+    ),
+    index("legal_hold_events_resource_index").on(
+      table.organizationId,
+      table.resourceType,
+      table.resourceId,
+      table.occurredAt,
+    ),
+  ],
+);
+
+/** Rebuildable projection answering "is this held right now?" in one read. */
+export const effectiveLegalHolds = pgTable(
+  "effective_legal_holds",
+  {
+    holdId: uuid("hold_id").primaryKey(),
+    organizationId: text("organization_id").notNull(),
+    resourceType: text("resource_type").notNull(),
+    resourceId: text("resource_id").notNull(),
+    state: text("state").notNull(),
+    revision: integer("revision").notNull(),
+    placedAt: timestamp("placed_at", { withTimezone: true }).notNull(),
+    releasedAt: timestamp("released_at", { withTimezone: true }),
+    lastEventId: uuid("last_event_id").notNull(),
+  },
+  (table) => [
+    index("effective_legal_holds_resource_index").on(
+      table.organizationId,
+      table.resourceType,
+      table.resourceId,
+      table.state,
+    ),
+  ],
+);
+
+/**
+ * One key per subject. Destroying the key IS erasure — this is the single
+ * table where a value is nulled in place, and it deliberately carries no
+ * append-only trigger for that reason. The erasure event itself is recorded
+ * immutably in audit_events, so the act stays evidenced after the key is gone.
+ */
+export const subjectEncryptionKeys = pgTable("subject_encryption_keys", {
+  subjectId: uuid("subject_id").primaryKey(),
+  organizationId: text("organization_id").notNull(),
+  keyMaterial: text("key_material"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+  shreddedAt: timestamp("shredded_at", { withTimezone: true }),
+  shreddedByAccountId: text("shredded_by_account_id"),
+  shredReasonCode: text("shred_reason_code"),
+});

@@ -115,3 +115,22 @@ export const assertDeadlineCanBeConfirmed = (input: {
     );
   }
 };
+
+export type {
+  DestructionDecision,
+  DestructionRefusalReason,
+  EffectiveLegalHold,
+  ErasureDecision,
+  HeldResource,
+  LegalHoldCommand,
+  LegalHoldEventType,
+  LegalHoldState,
+  LegalHoldTransition,
+} from "./records-lifecycle.js";
+export {
+  deriveLegalHoldTransition,
+  evaluateRecordDestruction,
+  evaluateSubjectErasure,
+  isResourceHeld,
+  RecordsLifecycleValidationError,
+} from "./records-lifecycle.js";
