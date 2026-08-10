@@ -30,13 +30,16 @@ jobs:
       DATABASE_URL: postgresql://lexgate:lexgate@127.0.0.1:5432/lexgate
     steps:
       - uses: actions/checkout@v4
+      # pnpm must be installed before setup-node: resolving the pnpm cache
+      # requires running `pnpm store path`, so `cache: pnpm` fails with
+      # "Unable to locate executable file: pnpm" if the order is reversed.
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.13.1
       - run: pnpm install --frozen-lockfile
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium

@@ -92,12 +92,24 @@ the convergence review was run against this feature after implementation. It fou
 
 **Process failure worth recording**: three tasks in this feature were marked complete before the work was done — the mixed-fragment test (T007), the traceability update (T022), and the convergence run itself (T025). Each was found by later audit and completed. The task checkmarks in this feature are therefore not independent evidence; the passing commands and the committed artifacts are. Recorded as D-012.
 
+## Security review
+
+Reviewed the changes for security impact. The repository has no configured remote, so the review was performed directly against the commit range rather than a base branch.
+
+- **Authorization fail-closed guard** (`packages/database/src/authorization.ts`): the added check can only convert an allow into a denial, never a denial into an allow. An allow requires both an effective membership and a matching grant, so the guard cannot deny a legitimately evidenced decision.
+- **Curated marks**: none of the three SVGs contains a script element, event handler, `javascript:` reference, or fetchable remote reference. A mark is emitted as a same-origin static asset; rendered in an `<img>` it cannot execute, but direct navigation to the asset URL renders it as a document, so a scripted SVG would be an XSS vector. A standing guard now rejects one. Verified by injecting an `onload` handler: both the guard **and** the provenance digest failed, so two independent controls detect a tampered asset.
+- **Log redaction**: matching is key-based, so a restricted value hidden inside an innocuous key's text is not redacted. This is inherent to the approach and is a limitation rather than a defect. The pattern has no nested quantifiers, so it carries no catastrophic-backtracking risk, and `Object.fromEntries` creates own properties rather than invoking setters, so a `__proto__` key cannot pollute a prototype.
+- **Ignore rules**: local settings, credentials, and tokens remain ignored. Nothing added to an ignore file in this change could conceal a committed secret.
+
+**Not verified**: the 30 committed `woff2` files are pinned by checksum, which proves what is committed has not changed since, but does not independently prove they are the genuine upstream releases. Verifying that would need upstream digests from the font projects. Recorded as a residual risk.
+
 ## Residual risks and blocked items
 
 - **Inclusive user review** with Arabic-speaking assistive-technology users has not occurred and is required before any client-facing surface. Not yet due.
 - **Font subsets are narrow.** A name using a character outside the committed subsets falls through the declared same-script stack. The ordering makes that degrade legibly, but a future personal-name surface should re-check subset coverage against real Arabic name data.
 - **No canonical requirement ID governs brand-token consistency or asset provenance.** This feature anchors to `I18N-RTL-001` and LG-BRAND-001. A dedicated requirement ID remains a sponsor decision.
 - **The 31 MB brand source bundle is not committed** (decision D-007). Provenance is preserved by checksum rather than by byte comparison against an in-tree copy.
+- **Typeface authenticity is pinned but not independently proven.** The committed `woff2` files carry checksums that detect later alteration, but nothing in this repository proves they are the genuine upstream SIL OFL releases. Confirming that needs digests published by the font projects.
 - **`packages/brand/src/tokens.css` is excluded from Prettier**, because the generator and the formatter would otherwise both claim authority over the same bytes. The parity test is that file's authority.
 
 No exception is requested. No reviewer approval is required for this risk tier, and none is claimed.

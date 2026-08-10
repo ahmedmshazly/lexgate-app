@@ -64,6 +64,40 @@ describe("curated asset provenance (FR-005, FR-006, SC-005)", () => {
     }
   });
 
+  it("admits no mark carrying active or remote content", async () => {
+    // A curated mark is emitted as a same-origin static asset. Rendered in an
+    // <img> it cannot execute, but navigating to the asset URL directly
+    // renders it as a document, so a scripted SVG would be an XSS vector.
+    // Remote references would also leak a reader's address to a third party.
+    const marks = (await readdir(`${packageRoot}assets`)).filter((name) =>
+      name.endsWith(".svg"),
+    );
+    expect(marks.length).toBeGreaterThan(0);
+
+    for (const mark of marks) {
+      const contents = await readFile(`${packageRoot}assets/${mark}`, "utf8");
+
+      expect(contents, `${mark} contains a script element`).not.toMatch(
+        /<script/i,
+      );
+      expect(contents, `${mark} contains an event handler`).not.toMatch(
+        /\son\w+\s*=/i,
+      );
+      expect(contents, `${mark} contains a javascript: reference`).not.toMatch(
+        /javascript:/i,
+      );
+      // xmlns declarations are namespace identifiers, never fetched, so only
+      // genuinely fetchable references count as remote content.
+      const fetchable = contents.replace(/xmlns(:\w+)?="[^"]*"/gi, "");
+      expect(fetchable, `${mark} references a remote host`).not.toMatch(
+        /(?:href|src)\s*=\s*["']https?:\/\/|url\(\s*["']?https?:\/\//i,
+      );
+      expect(contents, `${mark} embeds foreign content`).not.toMatch(
+        /<foreignObject/i,
+      );
+    }
+  });
+
   it("leaves no committed asset without provenance", async () => {
     const recorded = new Set(manifest.assets.map((asset) => asset.file));
 
