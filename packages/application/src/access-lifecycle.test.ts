@@ -38,7 +38,8 @@ const input = (): AccessLifecycleCommandInput => ({
     expectedRevision: null,
     occurredAt,
     effectiveAt: occurredAt,
-    expiresAt: null,
+    // A grant may not outlive the approval that authorised it.
+    expiresAt: approval.expiresAt,
     reasonCode: "approved_synthetic_access",
     approvalId: approval.id,
   },

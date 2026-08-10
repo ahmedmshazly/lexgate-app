@@ -68,7 +68,9 @@ const fixture = (scope: AccessLifecycleScope = { kind: "membership" }) => {
     expectedRevision: input.expectedRevision,
     occurredAt,
     effectiveAt: occurredAt,
-    expiresAt: null,
+    // A grant may not outlive the approval that authorised it. Removal
+    // commands carry no approval, so the bound is harmless for them.
+    expiresAt: approval.expiresAt,
     reasonCode: "synthetic_access_lifecycle",
     approvalId:
       input.approvalId ??
@@ -392,5 +394,42 @@ describe("PostgreSQL access lifecycle", () => {
         organizationId: "synthetic-empty-org-" + crypto.randomUUID(),
       }),
     ).resolves.toEqual({ membershipCount: 0, grantCount: 0 });
+  });
+
+  it("spends an approval on one grant so it cannot back a second (FR-003)", async () => {
+    const current = fixture();
+    await persistApproval(current.approval);
+
+    const applyGrant = async (relationshipId: string) => {
+      const command = {
+        ...current.command({ eventType: "granted", expectedRevision: null }),
+        relationshipId,
+      };
+      return persistence.apply({
+        actor: {
+          accountId: command.operatorAccountId,
+          organizationId: current.organizationId,
+        },
+        command,
+        transition: deriveAccessLifecycleTransition({
+          command,
+          current: null,
+          approval: current.approval,
+        }),
+        approval: current.approval,
+        commandFingerprint: `fingerprint-${command.commandId}`,
+      });
+    };
+
+    await expect(applyGrant(current.relationshipId)).resolves.toMatchObject({
+      revision: 1,
+      state: "active",
+    });
+
+    // A second relationship citing the same approval. The domain accepts it —
+    // subject and scope still match — so the single-use guarantee has to hold
+    // where the event is written. Without it, an approver authorising one
+    // grant silently backs an unlimited series.
+    await expect(applyGrant(crypto.randomUUID())).rejects.toThrow();
   });
 });

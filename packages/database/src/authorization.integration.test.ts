@@ -106,7 +106,8 @@ const createFixture = () => {
       expectedRevision: null,
       occurredAt,
       effectiveAt: occurredAt,
-      expiresAt: null,
+      // A grant may not outlive the approval that authorised it.
+      expiresAt: approval.expiresAt,
       reasonCode: "synthetic_access_lifecycle",
       approvalId: approval.id,
     };
@@ -472,6 +473,36 @@ describe("PostgreSQL restricted-resource authorization", () => {
 
     expect(retainedEvidence).toHaveLength(0);
     expect(retainedGrants).toHaveLength(1);
+  });
+
+  it("does not let a replayed decision outlive the access it recorded", async () => {
+    const membershipId = await fixture.seedMembership();
+    await fixture.seedExactGrant();
+    const input = fixture.request();
+
+    await expect(authorization.evaluate(input)).resolves.toEqual({
+      outcome: "allowed",
+      reason: "explicit_relationship",
+    });
+
+    await fixture.revokeMembership(membershipId);
+
+    // Replaying the same decision ID must not return the stored "allowed".
+    // A decision ID is supplied by the caller and nothing bounds its
+    // lifetime, so a cached allow would otherwise survive the revocation
+    // indefinitely.
+    await expect(authorization.evaluate(input)).resolves.toEqual({
+      outcome: "denied",
+      reason: "not_authorized",
+    });
+
+    // The original decision stays in evidence — the record is history, not
+    // a standing permission.
+    const [recorded] = await database
+      .select()
+      .from(authorizationDecisions)
+      .where(eq(authorizationDecisions.id, input.decisionId));
+    expect(recorded).toMatchObject({ outcome: "allowed" });
   });
 
   it("ignores a browser permission assertion in both directions (SC-002)", async () => {

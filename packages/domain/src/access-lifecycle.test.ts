@@ -40,7 +40,9 @@ const command = (
   expectedRevision: null,
   occurredAt,
   effectiveAt: occurredAt,
-  expiresAt: null,
+  // Bounded by the approval's own expiry: a grant may not outlive what was
+  // authorised, so a null expiry against a bounded approval is rejected.
+  expiresAt: approval.expiresAt,
   reasonCode: "approved_synthetic_access",
   approvalId: approval.id,
   ...overrides,
@@ -195,5 +197,43 @@ describe("access lifecycle domain transitions", () => {
         approval,
       }),
     ).toThrow(AccessLifecycleValidationError);
+  });
+});
+
+describe("a grant cannot outlive its approval", () => {
+  it("rejects an expiry beyond the approval's own expiry", () => {
+    expect(() =>
+      deriveAccessLifecycleTransition({
+        command: command({
+          expiresAt: new Date("2026-09-01T12:00:00.000Z"),
+        }),
+        current: null,
+        approval,
+      }),
+    ).toThrow(AccessLifecycleValidationError);
+  });
+
+  it("rejects an open-ended grant made against a bounded approval", () => {
+    // The escalation this closes: an approver authorising a week of access
+    // has no other guarantee the resulting grant is time-boxed at all.
+    expect(() =>
+      deriveAccessLifecycleTransition({
+        command: command({ expiresAt: null }),
+        current: null,
+        approval,
+      }),
+    ).toThrow(AccessLifecycleValidationError);
+  });
+
+  it("allows an open-ended grant when the approval is itself open-ended", () => {
+    const openEnded: AccessApprovalRecord = { ...approval, expiresAt: null };
+
+    expect(
+      deriveAccessLifecycleTransition({
+        command: command({ expiresAt: null }),
+        current: null,
+        approval: openEnded,
+      }).expiresAt,
+    ).toBeNull();
   });
 });

@@ -234,6 +234,18 @@ const assertApprovalIsValid = (input: {
       "An access subject cannot request, approve, or operate their own expansion.",
     );
   }
+  // A grant must not outlive the approval that authorised it. Checking only
+  // the command's occurrence time against the approval window would let a
+  // short-lived approval back a permanent grant, which is not what the
+  // approver agreed to.
+  if (
+    approval.expiresAt !== null &&
+    (command.expiresAt === null || command.expiresAt > approval.expiresAt)
+  ) {
+    throw new AccessLifecycleValidationError(
+      "An access grant cannot outlive the approval that authorised it.",
+    );
+  }
   return approval;
 };
 

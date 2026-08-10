@@ -31,6 +31,96 @@ const asAuthorizationDecision = (input: {
   throw new Error("Authorization decision evidence has an invalid outcome.");
 };
 
+const deniedDecision: AuthorizationDecision = {
+  outcome: "denied",
+  reason: "not_authorized",
+};
+
+/**
+ * Re-runs the policy against current state for a replayed decision.
+ *
+ * Only the effective projections are read. A legacy relationship can no
+ * longer produce an allow — an allowed decision must carry revision evidence
+ * — so reading them here would add nothing. The domain evaluator is called
+ * rather than reimplemented, so this cannot drift from the policy.
+ */
+const currentDecisionAllows = async (
+  transaction: Parameters<Parameters<Database["transaction"]>[0]>[0],
+  request: RestrictedResourceAuthorizationRequest,
+): Promise<boolean> => {
+  const [membership] = await transaction
+    .select()
+    .from(effectiveOrganizationMemberships)
+    .where(
+      and(
+        eq(effectiveOrganizationMemberships.accountId, request.actorAccountId),
+        eq(
+          effectiveOrganizationMemberships.organizationId,
+          request.organizationId,
+        ),
+      ),
+    );
+  const grants = await transaction
+    .select()
+    .from(effectiveRestrictedResourceAccessGrants)
+    .where(
+      and(
+        eq(
+          effectiveRestrictedResourceAccessGrants.accountId,
+          request.actorAccountId,
+        ),
+        eq(
+          effectiveRestrictedResourceAccessGrants.organizationId,
+          request.organizationId,
+        ),
+        eq(
+          effectiveRestrictedResourceAccessGrants.resourceType,
+          request.resource.type,
+        ),
+        eq(
+          effectiveRestrictedResourceAccessGrants.resourceId,
+          request.resource.id,
+        ),
+        eq(
+          effectiveRestrictedResourceAccessGrants.operation,
+          request.operation,
+        ),
+      ),
+    );
+
+  if (!membership || grants.length === 0) return false;
+
+  const at = new Date();
+  const isLive = (state: string, effectiveAt: Date, expiresAt: Date | null) =>
+    state === "active" &&
+    effectiveAt <= at &&
+    (expiresAt === null || expiresAt > at);
+
+  return (
+    evaluateRestrictedResourceAccess({
+      request,
+      membership: {
+        accountId: membership.accountId,
+        organizationId: membership.organizationId,
+        systemRole: membership.systemRole,
+        isActive: isLive(
+          membership.state,
+          membership.effectiveAt,
+          membership.expiresAt,
+        ),
+      },
+      grants: grants.map((grant) => ({
+        accountId: grant.accountId,
+        organizationId: grant.organizationId,
+        resourceType: grant.resourceType,
+        resourceId: grant.resourceId,
+        operation: grant.operation,
+        isActive: isLive(grant.state, grant.effectiveAt, grant.expiresAt),
+      })),
+    }).outcome === "allowed"
+  );
+};
+
 export const createRestrictedResourceAuthorizationPort = (
   database: Database,
 ): RestrictedResourceAuthorizationPort => ({
@@ -63,6 +153,19 @@ export const createRestrictedResourceAuthorizationPort = (
           throw new Error(
             "An authorization decision ID cannot be reused for a different request.",
           );
+        }
+
+        // A replayed decision must not outlive the access it recorded. The
+        // stored answer is evidence of what was decided, never a standing
+        // permission: a decision taken before a revocation would otherwise
+        // keep returning "allowed" indefinitely, because a decision ID is
+        // supplied by the caller and nothing constrains its lifetime.
+        if (existingDecision.outcome === "allowed") {
+          const stillAllowed = await currentDecisionAllows(
+            transaction,
+            request,
+          );
+          if (!stillAllowed) return deniedDecision;
         }
 
         return asAuthorizationDecision(existingDecision);
