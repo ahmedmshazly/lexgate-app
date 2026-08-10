@@ -1,7 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   createAuthorizationDecisionLogContext,
   createPartyIdentityCommandLogContext,
+  createRedactingLogger,
   redactForLog,
 } from "./index.js";
 
@@ -63,13 +64,31 @@ describe("log redaction (PRV-MIN-001)", () => {
 
   it("redacts a restricted value nested inside an object", () => {
     // A national identifier one level down is exactly the value that must
-    // never reach a log in the clear.
+    // never reach a log in the clear. A party's name goes with it: for an
+    // adverse party, the fact their name appears in Lex Gate's logs at all is
+    // a confidentiality fact independent of any identifier.
     expect(
       redactForLog({
-        subject: { nationalId: "synthetic-id", displayName: "keep" },
+        subject: { nationalId: "synthetic-id", displayName: "synthetic-name" },
       }),
     ).toEqual({
-      subject: { nationalId: "[REDACTED]", displayName: "keep" },
+      subject: { nationalId: "[REDACTED]", displayName: "[REDACTED]" },
+    });
+  });
+
+  it("redacts ordinary personal data, not only credentials", () => {
+    expect(
+      redactForLog({
+        fullName: "synthetic",
+        email: "synthetic@example.test",
+        phoneNumber: "synthetic",
+        homeAddress: "synthetic",
+      }),
+    ).toEqual({
+      fullName: "[REDACTED]",
+      email: "[REDACTED]",
+      phoneNumber: "[REDACTED]",
+      homeAddress: "[REDACTED]",
     });
   });
 
@@ -109,6 +128,53 @@ describe("log redaction (PRV-MIN-001)", () => {
       attempts: 2,
       published: null,
     });
+  });
+
+  it("routes every payload through redaction when a sink is wrapped", () => {
+    const sink = { info: vi.fn(), error: vi.fn() };
+    const logger = createRedactingLogger(sink);
+
+    logger.info(
+      { correlationId: "synthetic-correlation", operation: "party.read" },
+      "read",
+    );
+
+    expect(sink.info).toHaveBeenCalledWith({
+      level: "info",
+      correlationId: "synthetic-correlation",
+      operation: "party.read",
+      message: "read",
+    });
+  });
+
+  it("reduces an error to its type and message, never the whole object", () => {
+    const sink = { info: vi.fn(), error: vi.fn() };
+    const logger = createRedactingLogger(sink);
+
+    // A driver error commonly carries the bound values that caused it as
+    // enumerable properties. Serialising it whole would log them.
+    const error = Object.assign(new Error("constraint violated"), {
+      nationalId: "synthetic-id",
+      detail: "Failing row contains (...)",
+    });
+
+    logger.error(
+      { correlationId: "synthetic-correlation", operation: "party.create" },
+      "write failed",
+      error,
+    );
+
+    const payload = sink.error.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(payload).toEqual({
+      level: "error",
+      correlationId: "synthetic-correlation",
+      operation: "party.create",
+      message: "write failed",
+      errorType: "Error",
+      errorMessage: "constraint violated",
+    });
+    expect(JSON.stringify(payload)).not.toContain("synthetic-id");
+    expect(JSON.stringify(payload)).not.toContain("Failing row");
   });
 
   it("terminates on a self-referencing structure", () => {

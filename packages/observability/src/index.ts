@@ -53,9 +53,19 @@ export const createPartyIdentityCommandLogContext = (input: {
  * a substring, so `accessToken`, `API_KEY`, and `passportNumber` are caught as
  * well as their bare forms. Redaction that only inspected exact top-level keys
  * would let a national identifier one object deep through in the clear.
+ *
+ * Ordinary personal data is included, not only credentials. For a legal
+ * practice a party's name is personal data, and for an adverse party the fact
+ * that their name appears in Lex Gate's logs at all is a confidentiality fact
+ * independent of any identifier.
+ *
+ * `value` is deliberately NOT matched: it is too generic to block safely, even
+ * though it is the column holding party names and contact points. The control
+ * for that is the allow-list log contexts below, which emit a fixed set of
+ * opaque fields. A party row must never be handed to a logger wholesale.
  */
 const restrictedKeyPattern =
-  /pass(word|phrase|port)|secret|token|credential|api[-_]?key|national[-_]?id|document/i;
+  /pass(word|phrase|port)|secret|token|credential|api[-_]?key|national[-_]?id|document|name|email|phone|mobile|address/i;
 
 const redactedPlaceholder = "[REDACTED]";
 
@@ -84,3 +94,37 @@ export const redactForLog = (
   value: Record<string, unknown>,
 ): Record<string, unknown> =>
   redactUnknown(value, new WeakSet()) as Record<string, unknown>;
+
+export interface LogSink {
+  info(payload: Record<string, unknown>): void;
+  error(payload: Record<string, unknown>): void;
+}
+
+/**
+ * Wraps a sink so every emitted payload passes through redaction. Without this
+ * the redaction control is unreachable: a caller can hand an arbitrary object
+ * straight to a raw sink and bypass it entirely.
+ *
+ * An Error is reduced to its type and message rather than serialised whole,
+ * because an Error can carry arbitrary enumerable properties — a database
+ * driver's error commonly echoes the bound values that caused it. The type is
+ * published as `errorType` rather than `name` so redaction does not strip the
+ * one field that makes a log entry diagnosable.
+ */
+export const createRedactingLogger = (sink: LogSink): Logger => ({
+  info(context, message) {
+    sink.info(redactForLog({ level: "info", ...context, message }));
+  },
+  error(context, message, error) {
+    sink.error(
+      redactForLog({
+        level: "error",
+        ...context,
+        message,
+        ...(error
+          ? { errorType: error.name, errorMessage: error.message }
+          : {}),
+      }),
+    );
+  },
+});
