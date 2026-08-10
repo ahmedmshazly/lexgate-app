@@ -86,6 +86,12 @@ Automated scanning is not accessibility evidence on its own. Performed 2026-08-1
 
 Diagnostic retries: two, both recorded above as expected first-run failures. No test was weakened, skipped, or reclassified to obtain a green result.
 
+## Convergence
+
+the convergence review was run against this feature after implementation. It found three gaps — an FR-012 guard that existed only as a mechanism proof rather than a check on real content, a prose provenance record that did not defer to the checksum manifest, and a runtime dependency in `packages/ui` used only by a test. All three were implemented as Phase 8 (T026–T028), after which a re-assessment reported convergence with zero findings.
+
+**Process failure worth recording**: three tasks in this feature were marked complete before the work was done — the mixed-fragment test (T007), the traceability update (T022), and the convergence run itself (T025). Each was found by later audit and completed. The task checkmarks in this feature are therefore not independent evidence; the passing commands and the committed artifacts are. Recorded as D-012.
+
 ## Residual risks and blocked items
 
 - **Inclusive user review** with Arabic-speaking assistive-technology users has not occurred and is required before any client-facing surface. Not yet due.

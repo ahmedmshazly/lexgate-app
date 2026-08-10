@@ -134,3 +134,11 @@
 - Every task names a precise path and traces to a requirement ID.
 - Tests fail first. No test may be weakened to preserve a prior green build.
 - Completing every task closes no release gate. G1, ODR-003, ODR-004, and G2 remain blocked on their accountable reviewers, and ODR-002 continues to block public marketing content.
+
+---
+
+## Phase 8: Convergence
+
+- [x] T026 Add a guard asserting that shell content carrying script-mixed text declares a language attribute for the differing fragment, in `packages/testing/src/brand-boundaries.test.ts`, per FR-012 (partial). The requirement is satisfied only vacuously today because no mixed-language fragment exists; without a guard it will break silently when bilingual party names are first rendered.
+- [x] T027 Make `packages/brand/assets/provenance.json` the single authority for asset provenance and have `packages/brand/assets/README.md` reference it rather than restating it, per FR-005 (partial).
+- [x] T028 Move `@lexgate/brand` from `dependencies` to `devDependencies` in `packages/ui/package.json`, since no production source imports it, per plan: affected packages (unrequested).

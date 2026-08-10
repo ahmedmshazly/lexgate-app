@@ -104,6 +104,51 @@ describe("brand assets stay inside their approved supply point (FR-004, SC-006)"
   });
 });
 
+describe("language of parts is declared (FR-012)", () => {
+  const arabicScript = /[؀-ۿ]/;
+
+  it("declares a language attribute wherever a string mixes scripts", async () => {
+    // Typeface selection and WCAG 3.1.2 both depend on a fragment whose
+    // language differs from its page carrying its own lang attribute. No such
+    // fragment exists yet, so this guard exists to fail the moment one is
+    // introduced without it — bilingual party names are the expected first
+    // case, and the failure would otherwise be silent.
+    const page = await readSurface("apps/web/src/app/[locale]/page.tsx");
+
+    const stringLiterals = page.match(/"[^"\n]*"|'[^'\n]*'/g) ?? [];
+    const scriptMixed = stringLiterals.filter((literal) => {
+      const hasArabic = arabicScript.test(literal);
+      const hasLatinWord = /[A-Za-z]{2,}/.test(literal);
+      return hasArabic && hasLatinWord;
+    });
+
+    for (const literal of scriptMixed) {
+      expect(
+        page.includes("lang="),
+        `${literal} mixes scripts, so the differing fragment must declare its own lang attribute`,
+      ).toBe(true);
+    }
+  });
+
+  it("keeps each locale's copy in a single script", async () => {
+    const page = await readSurface("apps/web/src/app/[locale]/page.tsx");
+    const arabicBlock = page.slice(page.indexOf("ar: {"));
+
+    // The Arabic block may name Latin-script product terms, but the English
+    // block must not silently carry Arabic without a language attribute.
+    const englishBlock = page.slice(
+      page.indexOf("en: {"),
+      page.indexOf("ar: {"),
+    );
+
+    expect(
+      arabicScript.test(englishBlock) && !englishBlock.includes("lang="),
+      "the English copy contains Arabic script with no language attribute",
+    ).toBe(false);
+    expect(arabicScript.test(arabicBlock)).toBe(true);
+  });
+});
+
 describe("no third-party asset host is referenced (FR-001, SC-002)", () => {
   it("declares every font from the repository's own package", async () => {
     const globals = await readSurface("apps/web/src/app/globals.css");

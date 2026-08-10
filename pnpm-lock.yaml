@@ -137,12 +137,13 @@ importers:
 
   packages/ui:
     dependencies:
-      "@lexgate/brand":
-        specifier: workspace:*
-        version: link:../brand
       react:
         specifier: ^19.0.0
         version: 19.2.8
+    devDependencies:
+      "@lexgate/brand":
+        specifier: workspace:*
+        version: link:../brand
 
 packages:
   "@axe-core/playwright@4.12.1":

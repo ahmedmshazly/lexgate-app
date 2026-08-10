@@ -24,7 +24,14 @@ traceability:
     gate: G0
   - requirement: I18N-RTL-001
     architecture: [LG-BRAND-001]
-    implementation: [apps/web, packages/localization, packages/ui]
+    implementation:
+      [
+        apps/web,
+        packages/localization,
+        packages/ui,
+        packages/brand,
+        specs/005-brand-system,
+      ]
     evidence: [e2e:locale-shell]
     gate: G0
   - requirement: SEC-AUT-001
