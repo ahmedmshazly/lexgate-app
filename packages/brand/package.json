@@ -4,12 +4,17 @@
   "private": true,
   "type": "module",
   "exports": {
+    ".": "./src/index.ts",
     "./tokens.css": "./src/tokens.css",
-    "./tokens": "./src/tokens.ts"
+    "./tokens": "./src/tokens.ts",
+    "./fonts.css": "./assets/fonts/fonts.css",
+    "./assets/*": "./assets/*"
   },
   "scripts": {
     "lint": "eslint src --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "tokens:generate": "tsx src/write-tokens-css.ts",
+    "provenance:generate": "tsx src/write-provenance.ts"
   }
 }

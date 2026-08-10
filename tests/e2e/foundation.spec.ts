@@ -15,9 +15,12 @@ test("English foundation shell is branded and explicitly internal", async ({
 }) => {
   await page.goto("/en");
   await expect(page.locator("main")).toContainText("Milestone M0");
+  // The mark is supplied by @lexgate/brand and emitted by the bundler, so its
+  // path is fingerprinted rather than a hand-written public path. Asserting
+  // the literal public path would re-admit the duplicate supply point.
   await expect(page.locator("img.portal-mark")).toHaveAttribute(
     "src",
-    "/brand/portal-gold.svg",
+    /portal-gold\.[^/]*svg/,
   );
   await expect(page.locator("[data-classification=internal]")).toContainText(
     "Internal",

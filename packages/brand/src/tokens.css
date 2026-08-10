@@ -1,3 +1,4 @@
+/* GENERATED from tokens.ts by generate-tokens-css.ts. Do not edit. */
 :root {
   --lg-navy-950: #0a1524;
   --lg-navy-900: #0e1c30;
@@ -16,4 +17,9 @@
   --lg-warning: #8a6a22;
   --lg-critical: #7a2b2b;
   --lg-radius: 0.5rem;
+  --lg-font-ui: "Instrument Sans", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --lg-font-display: "Newsreader", "Noto Naskh Arabic", Georgia, serif;
+  --lg-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --lg-font-ui-arabic: "IBM Plex Sans Arabic", "Instrument Sans", system-ui, sans-serif;
+  --lg-font-display-arabic: "Noto Naskh Arabic", "Newsreader", Georgia, serif;
 }

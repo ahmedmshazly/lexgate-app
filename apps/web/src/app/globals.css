@@ -1,4 +1,5 @@
 @import "@lexgate/brand/tokens.css";
+@import "@lexgate/brand/fonts.css";
 
 * {
   box-sizing: border-box;
@@ -10,7 +11,17 @@ body {
   margin: 0;
   background: var(--lg-warm-white);
   color: var(--lg-ink);
-  font-family: Arial, "IBM Plex Sans Arabic", sans-serif;
+  font-family: var(--lg-font-ui);
+}
+
+/* Rebinding the role aliases, rather than setting font-family per element,
+ * means every consumer of a role token follows the semantic language of its
+ * content. An Arabic fragment inside an English page is therefore typeset
+ * with an Arabic face; keying off dir or a body class would get the page
+ * right and the fragment wrong. */
+:lang(ar) {
+  --lg-font-ui: var(--lg-font-ui-arabic);
+  --lg-font-display: var(--lg-font-display-arabic);
 }
 
 .locale-root {
@@ -43,7 +54,7 @@ body {
   align-items: center;
   gap: 0.75rem;
   color: var(--lg-navy-900);
-  font-family: Georgia, "Noto Naskh Arabic", serif;
+  font-family: var(--lg-font-display);
   font-size: 1.3rem;
   font-weight: 600;
   text-decoration: none;
@@ -55,10 +66,15 @@ body {
   flex: none;
 }
 
+/* Gold alone is 2.82:1 against the warm-white ground, below the 3:1 that
+ * WCAG 2.2 SC 1.4.11 requires of a focus indicator. The approved gold stays
+ * as the visible focus colour and the navy ring carries the contrast, so the
+ * indicator is conformant without reassigning an approved brand token. */
 .brand-lockup:focus-visible {
-  outline: 3px solid var(--lg-gold-600);
+  outline: 3px solid var(--lg-navy-900);
   outline-offset: 0.3rem;
   border-radius: 0.15rem;
+  box-shadow: 0 0 0 0.3rem var(--lg-gold-600);
 }
 
 .classification {
@@ -87,7 +103,7 @@ body {
 
 h1 {
   color: var(--lg-navy-950);
-  font-family: Georgia, "Noto Naskh Arabic", serif;
+  font-family: var(--lg-font-display);
   font-size: clamp(2.5rem, 6vw, 5.5rem);
   font-weight: 500;
   letter-spacing: -0.035em;

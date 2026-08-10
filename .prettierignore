@@ -6,3 +6,6 @@ playwright-report
 test-results
 docs/archive
 Brand Identity Upgrade Request (1)
+# Generated from tokens.ts and pinned byte-for-byte by a parity test.
+# Prettier must not reformat it, or the generator and the formatter fight.
+packages/brand/src/tokens.css

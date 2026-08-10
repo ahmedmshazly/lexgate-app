@@ -137,6 +137,9 @@ importers:
 
   packages/ui:
     dependencies:
+      "@lexgate/brand":
+        specifier: workspace:*
+        version: link:../brand
       react:
         specifier: ^19.0.0
         version: 19.2.8
