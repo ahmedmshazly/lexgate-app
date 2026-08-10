@@ -12,18 +12,18 @@ This directory is the controlled, implementation-facing documentation set. It su
 
 ## Documentation map
 
-| Area            | Purpose                                                                                         |
-| --------------- | ----------------------------------------------------------------------------------------------- |
+| Area            | Purpose                                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `governance/`   | Document control, source policy, unresolved decisions, validation gates, bilingual terminology. |
-| `product/`      | Product scope, discovery protocol, service model, and release model.                            |
-| `requirements/` | Canonical SRS and machine-readable requirement records.                                         |
-| `architecture/` | System, domain/data, API/integration, and operational architecture.                             |
-| `assurance/`    | Security, privacy, records, test, and legal-workflow validation.                                |
-| `delivery/`     | DevOps, reliability, release, and incident-readiness requirements.                              |
-| `brand/`        | Visual system, tokens, asset provenance, and content safeguards.                                |
+| `product/`      | Product scope, discovery protocol, service model, and release model.                                                |
+| `requirements/` | Canonical SRS and machine-readable requirement records.                                                             |
+| `architecture/` | System, domain/data, API/integration, and operational architecture.                                                 |
+| `assurance/`    | Security, privacy, records, test, and legal-workflow validation.                                                    |
+| `delivery/`     | DevOps, reliability, release, and incident-readiness requirements.                                                  |
+| `brand/`        | Visual system, tokens, asset provenance, and content safeguards.                                                    |
 | `development/`  | Delivery workflow and quality-evidence standard. |
-| `legal/`        | Public-source refresh register and legal-review protocol.                                       |
-| `archive/`      | Immutable legacy source evidence.                                                               |
+| `legal/`        | Public-source refresh register and legal-review protocol.                                                           |
+| `archive/`      | Immutable legacy source evidence.                                                                                   |
 
 ## Status vocabulary
 
