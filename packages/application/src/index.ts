@@ -83,3 +83,15 @@ export const recordMaterialTransition = async (input: {
     event: input.event,
   });
 };
+
+export type {
+  LegalHoldOutcome,
+  LegalHoldPersistencePort,
+  RecordsLifecycleActor,
+  SubjectErasureOutcome,
+} from "./records-lifecycle.js";
+export {
+  applyLegalHoldCommand,
+  eraseSubjectCommand,
+  mayDestroyRecord,
+} from "./records-lifecycle.js";

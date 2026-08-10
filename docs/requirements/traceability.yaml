@@ -155,7 +155,8 @@ traceability:
     gate: G6
   - requirement: REC-HLD-001
     architecture: [ADR-010]
-    implementation: [packages/domain]
+    implementation:
+      [packages/domain, packages/database, specs/006-records-lifecycle]
     evidence: [domain:legal-hold]
     gate: G6
   - requirement: AI-GOV-001
