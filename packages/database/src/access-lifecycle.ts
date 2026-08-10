@@ -322,11 +322,31 @@ const uniqueLatestByRelationship = <T extends { relationshipId: string }>(
   return [...latest.values()];
 };
 
+/**
+ * Recovery primitive: rebuilds effective projections from the immutable
+ * ledgers. It rewrites every projection row for an organization, so it
+ * requires an attributable operator and records who ran it. Every other
+ * mutating path in this file writes audit evidence; a privileged recovery
+ * operation that left no trace would be the one exception, and the least
+ * defensible one.
+ */
 export const rebuildEffectiveAccessProjections = async (
   database: Database,
-  input: { organizationId: string },
-): Promise<{ membershipCount: number; grantCount: number }> =>
-  database.transaction(
+  input: {
+    organizationId: string;
+    actor: { accountId: string; reasonCode: string };
+  },
+): Promise<{ membershipCount: number; grantCount: number }> => {
+  if (
+    input.actor.accountId.trim().length === 0 ||
+    input.actor.reasonCode.trim().length === 0
+  ) {
+    throw new Error(
+      "A projection rebuild requires an attributable operator and reason.",
+    );
+  }
+
+  return database.transaction(
     async (transaction) => {
       await transaction.execute(
         sql.raw(
@@ -429,6 +449,15 @@ export const rebuildEffectiveAccessProjections = async (
             })),
           );
       }
+      await transaction.insert(auditEvents).values({
+        id: crypto.randomUUID(),
+        actorAccountId: input.actor.accountId,
+        action: "access_lifecycle.projection_rebuild",
+        resourceType: "organization",
+        resourceId: input.organizationId,
+        occurredAt: new Date(),
+      });
+
       return {
         membershipCount: memberships.length,
         grantCount: grants.length,
@@ -436,6 +465,7 @@ export const rebuildEffectiveAccessProjections = async (
     },
     { isolationLevel: "serializable", accessMode: "read write" },
   );
+};
 
 export const createAccessLifecycleApprovalPort = (
   database: Database,

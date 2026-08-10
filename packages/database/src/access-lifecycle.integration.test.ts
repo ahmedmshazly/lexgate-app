@@ -16,6 +16,7 @@ import {
 import {
   accessLifecycleApprovals,
   accessLifecycleCommandReceipts,
+  auditEvents,
   effectiveOrganizationMemberships,
   membershipLifecycleEvents,
   outboxEvents,
@@ -373,6 +374,10 @@ describe("PostgreSQL access lifecycle", () => {
     await expect(
       rebuildEffectiveAccessProjections(database, {
         organizationId: current.organizationId,
+        actor: {
+          accountId: "synthetic-recovery-operator",
+          reasonCode: "synthetic_projection_recovery",
+        },
       }),
     ).resolves.toEqual({ membershipCount: 1, grantCount: 0 });
     const [projection] = await database
@@ -392,8 +397,35 @@ describe("PostgreSQL access lifecycle", () => {
     await expect(
       rebuildEffectiveAccessProjections(database, {
         organizationId: "synthetic-empty-org-" + crypto.randomUUID(),
+        actor: {
+          accountId: "synthetic-recovery-operator",
+          reasonCode: "synthetic_projection_recovery",
+        },
       }),
     ).resolves.toEqual({ membershipCount: 0, grantCount: 0 });
+
+    // A privileged recovery operation that leaves no trace of who ran it is
+    // the least defensible gap in an otherwise fully audited write path.
+    await expect(
+      rebuildEffectiveAccessProjections(database, {
+        organizationId: current.organizationId,
+        actor: { accountId: "  ", reasonCode: "" },
+      }),
+    ).rejects.toThrow();
+
+    const [rebuildAudit] = await database
+      .select()
+      .from(auditEvents)
+      .where(
+        and(
+          eq(auditEvents.action, "access_lifecycle.projection_rebuild"),
+          eq(auditEvents.resourceId, current.organizationId),
+        ),
+      );
+    expect(rebuildAudit).toMatchObject({
+      actorAccountId: "synthetic-recovery-operator",
+      resourceType: "organization",
+    });
   });
 
   it("spends an approval on one grant so it cannot back a second (FR-003)", async () => {
