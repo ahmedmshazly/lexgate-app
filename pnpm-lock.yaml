@@ -106,8 +106,8 @@ importers:
         specifier: workspace:*
         version: link:../domain
       drizzle-orm:
-        specifier: ^0.44.4
-        version: 0.44.7(postgres@3.4.9)
+        specifier: ^0.45.2
+        version: 0.45.2(postgres@3.4.9)
       postgres:
         specifier: ^3.4.7
         version: 3.4.9
@@ -2528,10 +2528,10 @@ packages:
       }
     hasBin: true
 
-  drizzle-orm@0.44.7:
+  drizzle-orm@0.45.2:
     resolution:
       {
-        integrity: sha512-quIpnYznjU9lHshEOAYLoZ9s3jweleHlZIAWR/jX9gAWNg/JhQ1wj0KGRf7/Zm+obRrYd9GjPVJg790QY9N5AQ==,
+        integrity: sha512-kY0BSaTNYWnoDMVoyY8uxmyHjpJW1geOmBMdSSicKo9CIIWkSxMIj2rkeSR51b8KAPB7m+qysjuHme5nKP+E5Q==,
       }
     peerDependencies:
       "@aws-sdk/client-rds-data": ">=3"
@@ -5772,7 +5772,7 @@ snapshots:
       esbuild: 0.25.12
       tsx: 4.23.11
 
-  drizzle-orm@0.44.7(postgres@3.4.9):
+  drizzle-orm@0.45.2(postgres@3.4.9):
     optionalDependencies:
       postgres: 3.4.9
 
