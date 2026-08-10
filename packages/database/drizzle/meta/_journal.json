@@ -8,6 +8,83 @@
       "when": 1786295393652,
       "tag": "0000_nasty_hellcat",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786308731674,
+      "tag": "0001_closed_blade",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786311737836,
+      "tag": "0002_special_penance",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786311858337,
+      "tag": "0003_authorization-decision-immutability",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1786312745708,
+      "tag": "0004_authorization-relationship-immutability",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786316472166,
+      "tag": "0005_workable_bloodstrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786316600000,
+      "tag": "0006_party-identity-immutability",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1786317814360,
+      "tag": "0007_burly_bucky",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1786318000000,
+      "tag": "0008_party-identity-predecessor-integrity",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1786320881177,
+      "tag": "0009_loud_jean_grey",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1786320941464,
+      "tag": "0010_outstanding_abomination",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1786321049142,
+      "tag": "0011_low_angel",
+      "breakpoints": true
     }
   ]
 }

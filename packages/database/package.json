@@ -10,11 +10,13 @@
   "scripts": {
     "lint": "eslint src drizzle.config.ts --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run --passWithNoTests --no-file-parallelism",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
+    "@lexgate/application": "workspace:*",
+    "@lexgate/domain": "workspace:*",
     "drizzle-orm": "^0.44.4",
     "postgres": "^3.4.7"
   },

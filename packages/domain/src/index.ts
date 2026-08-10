@@ -1,5 +1,72 @@
 export type Brand<T, TBrand extends string> = T & { readonly __brand: TBrand };
 
+export {
+  evaluateRestrictedResourceAccess,
+  type AuthorizationDecision,
+  type OrganizationMembership,
+  type RestrictedResourceAccessGrant,
+  type RestrictedResourceAuthorizationPolicyInput,
+  type RestrictedResourceAuthorizationRequest,
+  type RestrictedResourceReference,
+} from "./authorization.js";
+
+export {
+  AccessLifecycleValidationError,
+  deriveAccessLifecycleTransition,
+  type AccessApprovalRecord,
+  type AccessLifecycleCommand,
+  type AccessLifecycleCommandOutcome,
+  type AccessLifecycleCommandResult,
+  type AccessLifecycleEvent,
+  type AccessLifecycleEventType,
+  type AccessLifecycleRelationshipKind,
+  type AccessLifecycleScope,
+  type AccessLifecycleState,
+  type AccessLifecycleTransition,
+  type EffectiveAccessRelationship,
+  type MembershipAccessScope,
+  type RestrictedResourceAccessScope,
+} from "./access-lifecycle.js";
+
+export {
+  assertionReviewStates,
+  createNeutralPartyMutation,
+  flagPossibleDuplicateMutation,
+  partyContactTypes,
+  partyKinds,
+  partyNameFormTypes,
+  recordPartyContactMutation,
+  recordPartyNameMutation,
+  recordRepresentationClaimMutation,
+  representationClaimStates,
+  PartyIdentityValidationError,
+  privacySubjectCategories,
+  validatePartyContact,
+  validatePartyNameForm,
+  validatePossibleDuplicate,
+  validatePrimaryNameAssignment,
+  validateRepresentationClaim,
+  validateSyntheticPrivacyHandlingMetadata,
+  type AssertionReviewState,
+  type CreateNeutralPartyInput,
+  type FlagPossibleDuplicateInput,
+  type PartyContactInput,
+  type PartyContactType,
+  type PartyIdentityMutation,
+  type PartyKind,
+  type PartyNameFormInput,
+  type PartyNameFormType,
+  type PossibleDuplicateInput,
+  type PrimaryNameAssignmentInput,
+  type PrivacySubjectCategory,
+  type RecordPartyContactInput,
+  type RecordPartyNameInput,
+  type RecordRepresentationClaimInput,
+  type RepresentationClaimInput,
+  type RepresentationClaimState,
+  type SyntheticPrivacyHandlingMetadata,
+} from "./party-identity.js";
+
 export type AggregateId = Brand<string, "AggregateId">;
 
 export type DomainEvent<

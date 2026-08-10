@@ -9,11 +9,10 @@ import {
   resolve,
 } from "node:path";
 import process from "node:process";
+import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
-const docsRoot = join(repositoryRoot, "docs");
-const failures: string[] = [];
 
 const walk = async (directory: string): Promise<string[]> => {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -26,13 +25,16 @@ const walk = async (directory: string): Promise<string[]> => {
   return nested.flat();
 };
 
-const requirePath = (path: string): void => {
-  if (!existsSync(path))
-    failures.push(`Missing required path: ${relative(repositoryRoot, path)}`);
+const requirePath = (path: string, failures: string[], root: string): void => {
+  if (!existsSync(path)) {
+    failures.push(`Missing required path: ${relative(root, path)}`);
+  }
 };
 
 const validateMarkdownLinks = async (
   markdownFiles: string[],
+  failures: string[],
+  root: string,
 ): Promise<void> => {
   for (const file of markdownFiles) {
     const content = await readFile(file, "utf8");
@@ -44,15 +46,16 @@ const validateMarkdownLinks = async (
       if (!target) continue;
       const resolved = normalize(join(dirname(file), target));
       if (!existsSync(resolved)) {
-        failures.push(
-          `${relative(repositoryRoot, file)} links to missing ${href}`,
-        );
+        failures.push(`${relative(root, file)} links to missing ${href}`);
       }
     }
   }
 };
 
-const validateRequirements = async (): Promise<void> => {
+const validateRequirements = async (
+  docsRoot: string,
+  failures: string[],
+): Promise<void> => {
   const requirementsPath = join(docsRoot, "requirements", "requirements.yaml");
   const traceabilityPath = join(docsRoot, "requirements", "traceability.yaml");
   const requirementsDocument = parse(
@@ -101,12 +104,15 @@ const validateRequirements = async (): Promise<void> => {
         failures.push(`${id} has no ${field}`);
       }
     }
-    if (!isNonEmptyStringArray(requirement.sources))
+    if (!isNonEmptyStringArray(requirement.sources)) {
       failures.push(`${id} has no sources`);
-    if (!isNonEmptyStringArray(requirement.acceptance))
+    }
+    if (!isNonEmptyStringArray(requirement.acceptance)) {
       failures.push(`${id} has no acceptance criteria`);
-    if (!isNonEmptyStringArray(requirement.tests))
+    }
+    if (!isNonEmptyStringArray(requirement.tests)) {
       failures.push(`${id} has no test evidence identifiers`);
+    }
   }
 
   for (const trace of traceability) {
@@ -158,7 +164,12 @@ const validateRequirements = async (): Promise<void> => {
   }
 };
 
-const run = async (): Promise<void> => {
+export const validateDocumentation = async (
+  root = repositoryRoot,
+): Promise<string[]> => {
+  const docsRoot = join(root, "docs");
+  const failures: string[] = [];
+
   for (const required of [
     "README.md",
     "governance/DOCUMENT_CONTROL.md",
@@ -171,8 +182,10 @@ const run = async (): Promise<void> => {
     "brand/BRAND_SYSTEM.md",
     "archive/pre-docs-2026-08-09/README.md",
   ]) {
-    requirePath(join(docsRoot, required));
+    requirePath(join(docsRoot, required), failures, root);
   }
+
+  if (!existsSync(docsRoot)) return failures;
 
   const files = await walk(docsRoot);
   const markdownFiles = files.filter(
@@ -180,8 +193,14 @@ const run = async (): Promise<void> => {
       extname(file) === ".md" &&
       !file.includes("/archive/pre-docs-2026-08-09/"),
   );
-  await validateMarkdownLinks(markdownFiles);
-  await validateRequirements();
+  await validateMarkdownLinks(markdownFiles, failures, root);
+  await validateRequirements(docsRoot, failures);
+
+  return failures;
+};
+
+const run = async (): Promise<void> => {
+  const failures = await validateDocumentation();
 
   if (failures.length > 0) {
     console.error(
@@ -192,9 +211,18 @@ const run = async (): Promise<void> => {
     return;
   }
 
+  const files = await walk(join(repositoryRoot, "docs"));
+  const markdownFiles = files.filter(
+    (file) =>
+      extname(file) === ".md" &&
+      !file.includes("/archive/pre-docs-2026-08-09/"),
+  );
   console.log(
     `Documentation validation passed (${markdownFiles.length} canonical Markdown files).`,
   );
 };
 
-void run();
+const invokedPath = process.argv[1];
+if (invokedPath && resolve(invokedPath) === fileURLToPath(import.meta.url)) {
+  void run();
+}

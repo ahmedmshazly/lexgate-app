@@ -1,5 +1,44 @@
 import type { DomainEvent } from "@lexgate/domain";
-import type { OutboxPort } from "@lexgate/events";
+
+export {
+  evaluateRestrictedResourceAccess,
+  type RestrictedResourceAuthorizationPort,
+} from "./authorization.js";
+
+export {
+  applyAccessLifecycleCommand,
+  AccessLifecyclePersistenceConflictError,
+  createAccessLifecycleCommandFingerprint,
+  type AccessLifecycleAdministrationAction,
+  type AccessLifecycleApprovalPort,
+  type AccessLifecycleAuthorizationPort,
+  type AccessLifecycleCommandHandler,
+  type AccessLifecycleCommandInput,
+  type AccessLifecyclePersistencePort,
+  type SessionInvalidationIntentPort,
+} from "./access-lifecycle.js";
+
+export {
+  createNeutralParty,
+  createPartyIdentityCommandFingerprint,
+  flagPossibleDuplicate,
+  PartyIdentityConflictError,
+  PartyIdentityNotFoundOrNotAuthorizedError,
+  readPartyIdentityHistory,
+  recordPartyContact,
+  recordPartyName,
+  recordRepresentationClaim,
+  type PartyIdentityAssertionCategory,
+  type PartyIdentityCommandOutcome,
+  type PartyIdentityCommandReceipt,
+  type PartyIdentityCommandResult,
+  type PartyIdentityContactHistory,
+  type PartyIdentityHistory,
+  type PartyIdentityNameHistory,
+  type PartyIdentityPrimaryNameAssignmentHistory,
+  type PartyIdentityPersistencePort,
+  type PartyIdentityReadOutcome,
+} from "./party-identity.js";
 
 export type Actor = Readonly<{
   accountId: string;
@@ -14,17 +53,13 @@ export interface AuthorizationPort {
   }): Promise<void>;
 }
 
-export interface AuditPort {
+export interface MaterialTransitionPersistencePort {
   record(input: {
     actor: Actor;
     action: string;
     resource: { type: string; id: string };
-    occurredAt: Date;
+    event: DomainEvent;
   }): Promise<void>;
-}
-
-export interface TransactionPort {
-  inTransaction<T>(work: () => Promise<T>): Promise<T>;
 }
 
 export const recordMaterialTransition = async (input: {
@@ -33,9 +68,7 @@ export const recordMaterialTransition = async (input: {
   resource: { type: string; id: string };
   event: DomainEvent;
   authorization: AuthorizationPort;
-  audit: AuditPort;
-  outbox: OutboxPort;
-  transaction: TransactionPort;
+  persistence: MaterialTransitionPersistencePort;
 }): Promise<void> => {
   await input.authorization.assertAuthorized({
     actor: input.actor,
@@ -43,13 +76,10 @@ export const recordMaterialTransition = async (input: {
     resource: input.resource,
   });
 
-  await input.transaction.inTransaction(async () => {
-    await input.audit.record({
-      actor: input.actor,
-      action: input.action,
-      resource: input.resource,
-      occurredAt: input.event.occurredAt,
-    });
-    await input.outbox.enqueue(input.event);
+  await input.persistence.record({
+    actor: input.actor,
+    action: input.action,
+    resource: input.resource,
+    event: input.event,
   });
 };

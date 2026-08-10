@@ -1,0 +1,2 @@
+DROP INDEX "access_lifecycle_approvals_scope_index";--> statement-breakpoint
+CREATE INDEX "access_lifecycle_approvals_scope_index" ON "access_lifecycle_approvals" USING btree ("organization_id","subject_account_id","relationship_kind","resource_type","resource_id","operation");

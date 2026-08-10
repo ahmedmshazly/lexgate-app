@@ -1,3 +1,4 @@
+import type { InactiveOutboxDeliveryMode } from "@lexgate/events";
 import type { Logger } from "@lexgate/observability";
 
 const logger: Logger = {
@@ -9,7 +10,21 @@ const logger: Logger = {
     ),
 };
 
-logger.info(
-  { correlationId: crypto.randomUUID(), operation: "worker.start" },
-  "Lex Gate worker foundation started; no provider deliveries are enabled.",
-);
+export const m0OutboxDeliveryMode: InactiveOutboxDeliveryMode = {
+  enabled: false,
+  reason: "No provider deliveries are enabled in the M0 foundation.",
+};
+
+export const startWorker = (
+  activeLogger: Logger,
+  correlationId: string = crypto.randomUUID(),
+): void => {
+  activeLogger.info(
+    { correlationId, operation: "worker.start" },
+    `Lex Gate worker foundation started; ${m0OutboxDeliveryMode.reason}`,
+  );
+};
+
+if (process.env.NODE_ENV !== "test") {
+  startWorker(logger);
+}

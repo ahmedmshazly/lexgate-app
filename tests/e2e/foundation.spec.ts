@@ -15,7 +15,10 @@ test("English foundation shell is branded and explicitly internal", async ({
 }) => {
   await page.goto("/en");
   await expect(page.locator("main")).toContainText("Milestone M0");
-  await expect(page.locator(".portal-mark")).toBeVisible();
+  await expect(page.locator("img.portal-mark")).toHaveAttribute(
+    "src",
+    "/brand/portal-gold.svg",
+  );
   await expect(page.locator("[data-classification=internal]")).toContainText(
     "Internal",
   );
@@ -29,5 +32,24 @@ test("Arabic foundation shell declares RTL direction", async ({ page }) => {
   await expect(page.locator("html")).toHaveAttribute("lang", "ar-EG");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   await expect(page.locator("h1")).toContainText("أساس منضبط");
+  await expect(page.locator("main")).toContainText("M0");
   await expectNoAutomaticAccessibilityViolations(page);
+});
+
+test("the foundation mark receives a visible keyboard focus treatment", async ({
+  page,
+}) => {
+  await page.goto("/en");
+
+  await page.keyboard.press("Tab");
+
+  const brandLink = page.getByRole("link", { name: "Lex Gate" });
+  await expect(brandLink).toBeFocused();
+  await expect(brandLink).toHaveCSS("outline-style", "solid");
+});
+
+test("unsupported locales are safely rejected", async ({ page }) => {
+  const response = await page.goto("/fr");
+
+  expect(response?.status()).toBe(404);
 });

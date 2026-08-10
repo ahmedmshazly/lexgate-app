@@ -13,7 +13,7 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
-    "test": "turbo test",
+    "test": "turbo test && vitest run tools/validate-docs.test.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "docs:validate": "tsx tools/validate-docs.ts",

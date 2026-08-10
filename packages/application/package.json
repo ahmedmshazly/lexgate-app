@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@lexgate/domain": "workspace:*",
-    "@lexgate/events": "workspace:*"
+    "@lexgate/events": "workspace:*",
+    "@lexgate/observability": "workspace:*"
   }
 }

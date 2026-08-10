@@ -11,6 +11,11 @@ Lex Gate is a private, Egypt-focused legal-practice platform. It is being built 
 3. Run `pnpm install`, `pnpm services:up`, `pnpm db:migrate`, then `pnpm dev`.
 4. Before handoff, run `pnpm verify`; run `pnpm verify:full` for the complete M0 gate.
 
+`pnpm verify` includes synthetic PostgreSQL integration coverage. Start the local
+services and apply migrations first; CI provisions an equivalent PostgreSQL
+service and runs the same migration step. Never substitute an external or
+production database for this evidence.
+
 If local port 5432 is already in use, set `POSTGRES_PORT=5433` for `pnpm services:up` and update the port in `DATABASE_URL` to match before running database commands.
 
 ## Repository map

@@ -2,17 +2,24 @@ schema_version: 1
 traceability:
   - requirement: ARC-MOD-001
     architecture: [ADR-001]
-    implementation: [packages/domain, packages/application]
+    implementation:
+      [
+        packages/domain,
+        packages/application,
+        packages/testing,
+        eslint.config.mjs,
+      ]
     evidence: [architecture:dependency-boundaries]
     gate: G0
   - requirement: ARC-OUT-001
     architecture: [ADR-006]
-    implementation: [packages/events, apps/worker]
+    implementation:
+      [packages/application, packages/database, packages/events, apps/worker]
     evidence: [integration:outbox-atomicity]
     gate: G0
   - requirement: INT-ADP-001
     architecture: [ADR-007]
-    implementation: [packages/integrations]
+    implementation: [packages/integrations, packages/testing, apps/worker]
     evidence: [architecture:adapter-boundary]
     gate: G0
   - requirement: I18N-RTL-001
@@ -22,32 +29,65 @@ traceability:
     gate: G0
   - requirement: SEC-AUT-001
     architecture: [ADR-005]
-    implementation: [packages/auth, packages/application]
-    evidence: [security:negative-authorization]
+    implementation:
+      [
+        packages/auth,
+        packages/domain,
+        packages/application,
+        packages/database,
+        packages/testing,
+        specs/002-authorization-policy,
+        specs/004-gate-readiness,
+      ]
+    evidence:
+      [security:negative-authorization, integration:authorization-policy]
     gate: G1
   - requirement: SEC-MAT-001
     architecture: [ADR-009]
-    implementation: [packages/auth, packages/domain]
-    evidence: [security:matter-isolation]
+    implementation:
+      [
+        packages/domain,
+        packages/application,
+        packages/database,
+        packages/testing,
+        specs/002-authorization-policy,
+        specs/004-gate-readiness,
+      ]
+    evidence: [security:matter-isolation, integration:authorization-policy]
     gate: G1
   - requirement: DAT-PRT-001
     architecture: [LG-DOM-001]
-    implementation: [packages/domain]
-    evidence: [domain:party-model]
+    implementation:
+      [
+        packages/domain,
+        packages/application,
+        packages/database,
+        packages/testing,
+        packages/observability,
+        specs/003-party-identity,
+        specs/004-gate-readiness,
+      ]
+    evidence:
+      [
+        domain:party-model,
+        integration:party-identity,
+        security:party-identity-authorization,
+      ]
     gate: G2
   - requirement: LEG-CFL-001
     architecture: [LG-DOM-001]
-    implementation: [packages/domain]
+    implementation: [packages/domain, specs/004-gate-readiness]
     evidence: [domain:conflict-opening]
     gate: G2
   - requirement: LEG-CFL-004
     architecture: [LG-DOM-001]
-    implementation: [packages/domain]
+    implementation: [packages/domain, specs/004-gate-readiness]
     evidence: [domain:conflict-review]
     gate: G2
   - requirement: LEG-ENG-001
     architecture: [LG-DOM-001]
-    implementation: [packages/domain, packages/application]
+    implementation:
+      [packages/domain, packages/application, specs/004-gate-readiness]
     evidence: [domain:engagement-activation]
     gate: G2
   - requirement: LEG-MAT-002
@@ -97,7 +137,7 @@ traceability:
     gate: G5
   - requirement: PRV-MIN-001
     architecture: [LG-PRV-001]
-    implementation: [packages/domain, apps/web]
+    implementation: [packages/domain, apps/web, specs/004-gate-readiness]
     evidence: [privacy:collection-inventory]
     gate: G6
   - requirement: REC-HLD-001
@@ -117,6 +157,7 @@ traceability:
     gate: G0
   - requirement: QLT-EVD-001
     architecture: [LG-DEV-002]
-    implementation: [CONSTITUTION.md, docs/development]
+    implementation:
+      [CONSTITUTION.md, docs/development, specs]
     evidence: [docs:quality-engineering-standard]
     gate: G0

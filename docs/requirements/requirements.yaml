@@ -30,7 +30,7 @@ requirements:
         unauthorized reads and mutations are denied,
         authorization is not delegated to the browser,
       ]
-    tests: [security:negative-authorization]
+    tests: [security:negative-authorization, integration:authorization-policy]
     legal_validation: not_required
   - id: SEC-MAT-001
     title: Matter access separation
@@ -42,18 +42,27 @@ requirements:
     sources: [LG-SRS-001, ADR-009]
     acceptance:
       [access requires an explicit relationship or approved break-glass flow]
-    tests: [security:matter-isolation]
+    tests: [security:matter-isolation, integration:authorization-policy]
     legal_validation: required
   - id: DAT-PRT-001
     title: Party identity model
     statement: The platform shall model people, organizations, names, aliases, contact points, and representation independently of matter state.
     priority: P1
-    status: proposed
+    status: approved
     owner: product
     release: M2
     sources: [LG-SRS-001, D10-gap]
-    acceptance: [Arabic and English aliases can be stored with provenance]
-    tests: [domain:party-model]
+    acceptance:
+      [
+        Arabic and English aliases can be stored with provenance,
+        identity assertions retain required synthetic privacy-handling metadata,
+      ]
+    tests:
+      [
+        domain:party-model,
+        integration:party-identity,
+        security:party-identity-authorization,
+      ]
     legal_validation: required
   - id: LEG-CFL-001
     title: Conflict before standard matter opening

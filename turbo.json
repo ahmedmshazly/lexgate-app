@@ -5,6 +5,7 @@
     "tsconfig.base.json",
     "pnpm-lock.yaml"
   ],
+  "globalEnv": ["DATABASE_URL"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

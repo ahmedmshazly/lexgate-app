@@ -52,7 +52,13 @@ body {
 .portal-mark {
   width: 2rem;
   height: 2rem;
-  color: var(--lg-gold-600);
+  flex: none;
+}
+
+.brand-lockup:focus-visible {
+  outline: 3px solid var(--lg-gold-600);
+  outline-offset: 0.3rem;
+  border-radius: 0.15rem;
 }
 
 .classification {
