@@ -31,7 +31,14 @@ import {
   partyPossibleDuplicateFlags,
   partyPrimaryNameAssignments,
   partyRepresentationClaims,
+  subjectEncryptionKeys,
 } from "./schema.js";
+import {
+  createSubjectKey,
+  decryptValue,
+  encryptValue,
+  ERASED_VALUE,
+} from "./subject-keys.js";
 
 type Database = PostgresJsDatabase;
 
@@ -308,6 +315,57 @@ const assertRepresentationPredecessor = async (input: {
   }
 };
 
+/**
+ * Personal values are stored encrypted under a key belonging to their subject,
+ * so that erasure can destroy the key rather than the record (ADR-010).
+ *
+ * The key is created on first use. Encryption happens here, at the persistence
+ * boundary, and never in the domain — the domain must keep seeing plaintext or
+ * assertSyntheticValue would be inspecting ciphertext and silently stop
+ * rejecting real personal data.
+ */
+const encryptForSubject = async (input: {
+  database: Database;
+  partyId: string;
+  organizationId: string;
+  plaintext: string;
+}): Promise<string> => {
+  await input.database
+    .insert(subjectEncryptionKeys)
+    .values({
+      subjectId: input.partyId,
+      organizationId: input.organizationId,
+      keyMaterial: createSubjectKey(),
+      createdAt: new Date(),
+    })
+    .onConflictDoNothing();
+
+  const [key] = await input.database
+    .select()
+    .from(subjectEncryptionKeys)
+    .where(eq(subjectEncryptionKeys.subjectId, input.partyId));
+
+  if (!key || key.keyMaterial === null) {
+    throw new PartyIdentityConflictError(
+      "An erased subject cannot receive new personal data.",
+    );
+  }
+
+  return encryptValue(input.plaintext, key.keyMaterial);
+};
+
+const readSubjectKey = async (
+  database: Database,
+  partyId: string,
+): Promise<string | null> => {
+  const [key] = await database
+    .select()
+    .from(subjectEncryptionKeys)
+    .where(eq(subjectEncryptionKeys.subjectId, partyId));
+
+  return key?.keyMaterial ?? null;
+};
+
 const insertNameForm = async (input: {
   database: Database;
   actor: Readonly<{ accountId: string; organizationId: string }>;
@@ -319,7 +377,12 @@ const insertNameForm = async (input: {
     id: input.name.id,
     organizationId: input.actor.organizationId,
     partyId: input.partyId,
-    value: normalizedText(input.name.value),
+    value: await encryptForSubject({
+      database: input.database,
+      partyId: input.partyId,
+      organizationId: input.actor.organizationId,
+      plaintext: normalizedText(input.name.value),
+    }),
     formType: input.name.formType,
     languageTag: normalizedText(input.name.languageTag),
     script: input.name.script ? normalizedText(input.name.script) : null,
@@ -361,7 +424,12 @@ const insertContact = async (input: {
     organizationId: input.actor.organizationId,
     partyId: input.partyId,
     contactType: input.contact.contactType,
-    value: normalizedText(input.contact.value),
+    value: await encryptForSubject({
+      database: input.database,
+      partyId: input.partyId,
+      organizationId: input.actor.organizationId,
+      plaintext: normalizedText(input.contact.value),
+    }),
     operationalPurpose: normalizedText(input.contact.operationalPurpose),
     reviewState: input.contact.reviewState,
     ...privacyValues(input.contact.privacy),
@@ -722,13 +790,23 @@ export const createPartyIdentityPersistencePort = (
       );
     }
 
+    // A subject whose key has been shredded reads as erased rather than
+    // failing: the history of what happened stays navigable even though the
+    // content is gone.
+    const keyMaterial = await readSubjectKey(database, input.partyId);
+    const reveal = (value: string): string =>
+      keyMaterial === null ? ERASED_VALUE : decryptValue(value, keyMaterial);
+
     return {
       id: party.id,
       kind: party.kind,
       primaryNameId: currentAssignment.nameFormId,
-      names,
+      names: names.map((name) => ({ ...name, value: reveal(name.value) })),
       primaryNameAssignments: orderedPrimaryAssignments,
-      contacts,
+      contacts: contacts.map((contact) => ({
+        ...contact,
+        value: reveal(contact.value),
+      })),
     } satisfies PartyIdentityHistory;
   },
 });

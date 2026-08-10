@@ -1,5 +1,11 @@
-import type { LegalHoldCommand } from "@lexgate/domain";
-import { deriveLegalHoldTransition } from "@lexgate/domain";
+import type {
+  CreateNeutralPartyInput,
+  LegalHoldCommand,
+} from "@lexgate/domain";
+import {
+  createNeutralPartyMutation,
+  deriveLegalHoldTransition,
+} from "@lexgate/domain";
 import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -8,7 +14,14 @@ import {
   createRecordsLifecyclePersistencePort,
   rebuildEffectiveLegalHolds,
 } from "./records-lifecycle.js";
-import { auditEvents, legalHoldEvents } from "./schema.js";
+import { createPartyIdentityPersistencePort } from "./party-identity.js";
+import {
+  auditEvents,
+  legalHoldEvents,
+  partyNameForms,
+  subjectEncryptionKeys,
+} from "./schema.js";
+import { ERASED_VALUE } from "./subject-keys.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -21,6 +34,42 @@ if (!databaseUrl) {
 const client = postgres(databaseUrl, { max: 2 });
 const database = drizzle({ client });
 const records = createRecordsLifecyclePersistencePort(database);
+const parties = createPartyIdentityPersistencePort(database);
+
+const syntheticPrivacy = {
+  processingPurpose: "party_identity_foundation",
+  dataClassification: "internal",
+  subjectCategory: "synthetic_individual",
+  source: "synthetic-fixture",
+  retentionCandidate: "synthetic_development_only",
+  accessBoundary: "internal_authorized_only",
+  validationRequirement: "privacy_and_g2_required",
+} as const;
+
+const createPartyCommand = (input: {
+  partyId: string;
+  name: string;
+}): CreateNeutralPartyInput => {
+  const nameId = crypto.randomUUID();
+  return {
+    commandId: crypto.randomUUID(),
+    correlationId: `synthetic-records-party-${crypto.randomUUID()}`,
+    partyId: input.partyId,
+    kind: "person",
+    partyPrivacy: syntheticPrivacy,
+    primaryName: {
+      id: nameId,
+      value: input.name,
+      formType: "legal",
+      languageTag: "ar",
+      script: "Arabic",
+      reviewState: "unreviewed",
+      privacy: syntheticPrivacy,
+    },
+    primaryNameAssignment: { id: crypto.randomUUID(), nameFormId: nameId },
+    occurredAt,
+  };
+};
 const occurredAt = new Date("2026-08-10T12:00:00.000Z");
 
 const fixture = () => {
@@ -270,5 +319,70 @@ describe("PostgreSQL records lifecycle", () => {
         actor: { accountId: "", reasonCode: "" },
       }),
     ).rejects.toThrow();
+  });
+
+  it("makes a real party's values unreadable while its history survives (FR-007, FR-008)", async () => {
+    const suffix = crypto.randomUUID();
+    const organizationId = `synthetic-records-org-${suffix}`;
+    const partyId = crypto.randomUUID();
+    const actor = { accountId: `synthetic-operator-${suffix}`, organizationId };
+    const command = createPartyCommand({ partyId, name: "أحمد اختبار" });
+
+    await parties.createParty({
+      actor,
+      command,
+      mutation: createNeutralPartyMutation(command),
+      commandFingerprint: `fingerprint-${partyId}`,
+    });
+
+    const readActor = {
+      accountId: actor.accountId,
+      correlationId: `synthetic-read-${suffix}`,
+    };
+    await expect(
+      parties.readPartyHistory({ organizationId, partyId, actor: readActor }),
+    ).resolves.toMatchObject({
+      names: [{ value: "أحمد اختبار" }],
+    });
+
+    await expect(
+      records.eraseSubject({
+        subjectId: partyId,
+        organizationId,
+        actor: {
+          accountId: "synthetic-privacy-officer",
+          reasonCode: "synthetic_erasure_request",
+        },
+      }),
+    ).resolves.toEqual({ outcome: "erased" });
+
+    // The value is gone, but the record of it is not: the read still resolves,
+    // still names the assertion, and still carries its provenance.
+    const erased = await parties.readPartyHistory({
+      organizationId,
+      partyId,
+      actor: readActor,
+    });
+    expect(erased).toMatchObject({
+      id: partyId,
+      names: [{ id: command.primaryName.id, value: ERASED_VALUE }],
+    });
+
+    // And nothing readable remains in storage.
+    const [stored] = await database
+      .select()
+      .from(partyNameForms)
+      .where(eq(partyNameForms.id, command.primaryName.id));
+    expect(stored!.value).not.toContain("أحمد");
+
+    const [key] = await database
+      .select()
+      .from(subjectEncryptionKeys)
+      .where(eq(subjectEncryptionKeys.subjectId, partyId));
+    expect(key).toMatchObject({
+      keyMaterial: null,
+      shreddedByAccountId: "synthetic-privacy-officer",
+      shredReasonCode: "synthetic_erasure_request",
+    });
   });
 });

@@ -15,6 +15,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { createPartyIdentityPersistencePort } from "./party-identity.js";
+import { decryptValue } from "./subject-keys.js";
 import {
   auditEvents,
   outboxEvents,
@@ -25,6 +26,7 @@ import {
   partyPossibleDuplicateFlags,
   partyPrimaryNameAssignments,
   partyRepresentationClaims,
+  subjectEncryptionKeys,
   effectiveRestrictedResourceAccessGrants,
 } from "./schema.js";
 
@@ -220,18 +222,36 @@ describe("PostgreSQL party identity foundation", () => {
       retentionCandidate: "synthetic_development_only",
       validationRequirement: "privacy_and_g2_required",
     });
+    // Personal values are stored encrypted under the subject's key. The
+    // guarantee these assertions protect is unchanged — the stored value
+    // faithfully round-trips what was submitted — but proving it by
+    // decryption is stronger, because it also proves the value is bound to
+    // this subject's key and is not readable without it.
+    const [subjectKey] = await database
+      .select()
+      .from(subjectEncryptionKeys)
+      .where(eq(subjectEncryptionKeys.subjectId, command.partyId));
+    const keyMaterial = subjectKey!.keyMaterial!;
+
     expect(name).toMatchObject({
-      value: command.primaryName.value.trim(),
       languageTag: "ar",
       script: "Arabic",
       source: "synthetic-fixture",
     });
+    expect(name!.value).not.toContain(command.primaryName.value.trim());
+    expect(decryptValue(name!.value, keyMaterial)).toBe(
+      command.primaryName.value.trim(),
+    );
+
     expect(contact).toMatchObject({
-      value: command.initialContact!.value.trim(),
       operationalPurpose: "party_identity_foundation",
       accessBoundary: "internal_authorized_only",
       source: "synthetic-fixture",
     });
+    expect(contact!.value).not.toContain(command.initialContact!.value.trim());
+    expect(decryptValue(contact!.value, keyMaterial)).toBe(
+      command.initialContact!.value.trim(),
+    );
     expect(receipt).toMatchObject({
       commandId: command.commandId,
       organizationId: fixture.organizationId,
