@@ -118,9 +118,15 @@ export interface PartyIdentityPersistencePort {
     mutation: PartyIdentityMutation;
     commandFingerprint: string;
   }): Promise<PartyIdentityCommandResult>;
+  /**
+   * Reads are attributable and recorded, including when nothing is found.
+   * A lookup that returns nothing and leaves no trace cannot be told apart
+   * from a lookup that never happened, which lets silence read as clearance.
+   */
   readPartyHistory(input: {
     organizationId: string;
     partyId: string;
+    actor: { accountId: string; correlationId: string };
   }): Promise<PartyIdentityHistory | null>;
 }
 
@@ -498,6 +504,10 @@ export const readPartyIdentityHistory = async (input: {
   const history = await input.persistence.readPartyHistory({
     organizationId: input.actor.organizationId,
     partyId: input.partyId,
+    actor: {
+      accountId: input.actor.accountId,
+      correlationId: input.correlationId,
+    },
   });
   if (!history) {
     return denyRead({

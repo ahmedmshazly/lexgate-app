@@ -3,6 +3,8 @@
 Lex Gate is a private, Egypt-focused legal-practice platform. It is being built as a controlled modular monolith that protects professional authority, client confidentiality, records integrity, and bilingual Arabic/English delivery.
 
 > **Status:** Milestone M0 — engineering foundation. This repository does not yet implement legal workflows, client access, payments, or AI assistance.
+>
+> **This is a personal build and learning project.** It is engineered as though it were a real legal-practice platform, but its four accountable reviewers — security, privacy/DPO, legal operations, and a practising Egyptian lawyer — have not been engaged and may never be. Every release gate is shut and stays shut. Nothing here is production-ready for a real legal practice without the reviews that were never done.
 
 ## Start here
 

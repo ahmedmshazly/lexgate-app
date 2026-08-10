@@ -14,6 +14,12 @@ No sponsor, template, test result, or tool output passes a gate.
 | ODR-004 | Blocked        | Product + legal-operations leads                 | Completed Pilot Operating Profile, discovery evidence, authoritative-system decision, and greenfield/migration decision | Firm scope, taxonomy, volumes, sources, and migration quality are not confirmed     | Greenfield synthetic pilot; no import or manual re-keying of historical records                            | No approval recorded |
 | G2      | Blocked        | Lead practising Egyptian lawyer                  | Signed scenario outcomes and future M3 conflict evidence                                                                | No lawyer outcome or conflict-review workflow/evidence exists                       | No conflict clearance, engagement, matter opening, authority, or legal conclusion                          | No approval recorded |
 
+## Programme status: dormant
+
+The sponsor confirmed on 2026-08-10 that this is a personal build and learning project, and that the four accountable reviewers **may never be engaged**. The gate programme is therefore **dormant, not imminent**: nobody is waiting on these signatures, and no further reviewer packets are being produced.
+
+This changes nothing about the gates themselves. Each stays `Blocked` with no approval recorded, and the safe interim behaviour in each row remains in force. Nothing behind them is activated: no real personal data, no real login, no live intake, no engagement, no conflict clearance. If this work is ever pointed at a real legal practice, every gate below still requires its named accountable reviewer, and nothing in this repository substitutes for that.
+
 ## Engineering readiness recommendations (not decisions)
 
 Prepared 2026-08-10 so each accountable reviewer receives a position to ratify or reject rather than a blank form. **A recommendation is not an outcome.** Every gate above stays `Blocked` and every "Recorded decision" cell stays `No approval recorded` until its named reviewer signs. The engineering side holds none of these authorities, and two of them require a qualified professional.

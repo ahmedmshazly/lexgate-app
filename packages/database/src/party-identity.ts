@@ -22,6 +22,7 @@ import type {
 import { and, asc, eq } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import {
+  auditEvents,
   outboxEvents,
   parties,
   partyContactAssertions,
@@ -611,6 +612,19 @@ export const createPartyIdentityPersistencePort = (
   },
 
   async readPartyHistory(input) {
+    const recordAttempt = async (found: boolean) => {
+      await database.insert(auditEvents).values({
+        id: crypto.randomUUID(),
+        actorAccountId: input.actor.accountId,
+        action: found
+          ? "party_identity.read.found"
+          : "party_identity.read.not_found",
+        resourceType: "party",
+        resourceId: input.partyId,
+        occurredAt: new Date(),
+      });
+    };
+
     const [party] = await database
       .select({ id: parties.id, kind: parties.kind })
       .from(parties)
@@ -620,7 +634,13 @@ export const createPartyIdentityPersistencePort = (
           eq(parties.id, input.partyId),
         ),
       );
-    if (!party) return null;
+    if (!party) {
+      // The negative result is the one that matters: it is what a reviewer
+      // would otherwise mistake for "nobody checked".
+      await recordAttempt(false);
+      return null;
+    }
+    await recordAttempt(true);
     if (party.kind !== "person" && party.kind !== "organization") {
       throw new Error("Party identity record has an invalid kind.");
     }

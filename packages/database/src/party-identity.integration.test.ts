@@ -16,6 +16,7 @@ import postgres from "postgres";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { createPartyIdentityPersistencePort } from "./party-identity.js";
 import {
+  auditEvents,
   outboxEvents,
   parties,
   partyContactAssertions,
@@ -258,6 +259,10 @@ describe("PostgreSQL party identity foundation", () => {
     const projection = await persistence.readPartyHistory({
       organizationId: fixture.organizationId,
       partyId: command.partyId,
+      actor: {
+        accountId: "synthetic-reader",
+        correlationId: "synthetic-read-correlation",
+      },
     });
     expect(projection).toMatchObject({
       id: command.partyId,
@@ -359,6 +364,10 @@ describe("PostgreSQL party identity foundation", () => {
       persistence.readPartyHistory({
         organizationId: fixture.organizationId,
         partyId: command.partyId,
+        actor: {
+          accountId: "synthetic-reader",
+          correlationId: "synthetic-read-correlation",
+        },
       }),
     ).resolves.toMatchObject({
       primaryNameId: replacementNameId,
@@ -530,6 +539,10 @@ describe("PostgreSQL party identity foundation", () => {
       persistence.readPartyHistory({
         organizationId: fixture.organizationId,
         partyId: command.partyId,
+        actor: {
+          accountId: "synthetic-reader",
+          correlationId: "synthetic-read-correlation",
+        },
       }),
     ).resolves.toMatchObject({
       primaryNameId: command.primaryName.id,
@@ -717,5 +730,35 @@ describe("PostgreSQL party identity foundation", () => {
         ),
       );
     expect(outboxRows).toHaveLength(1);
+  });
+
+  it("records a lookup that found nothing, so silence is not clearance (G2)", async () => {
+    const organizationId = `synthetic-org-${crypto.randomUUID()}`;
+    const missingPartyId = crypto.randomUUID();
+
+    await expect(
+      persistence.readPartyHistory({
+        organizationId,
+        partyId: missingPartyId,
+        actor: {
+          accountId: "synthetic-reader",
+          correlationId: "synthetic-read-correlation",
+        },
+      }),
+    ).resolves.toBeNull();
+
+    // The negative result is the one that matters. Without this record a
+    // reviewer cannot tell "checked, found nothing" from "never checked",
+    // and absence of a match reads as a clearance nobody granted.
+    const [attempt] = await database
+      .select()
+      .from(auditEvents)
+      .where(eq(auditEvents.resourceId, missingPartyId));
+
+    expect(attempt).toMatchObject({
+      actorAccountId: "synthetic-reader",
+      action: "party_identity.read.not_found",
+      resourceType: "party",
+    });
   });
 });
