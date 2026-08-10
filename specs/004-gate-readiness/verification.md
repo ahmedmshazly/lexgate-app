@@ -61,6 +61,9 @@ The concise sponsor decision is retained in [sponsor-approval-summary.md](eviden
 | 2026-08-10 | Focused lifecycle, authorization, party-regression, session-intent, packet, and documentation suites | Passed | 15 isolated PostgreSQL tests, lifecycle domain/application tests, auth tests, 13 testing-package boundary/packet tests, and docs validation passed. |
 | 2026-08-10 | Gate-packet static tests | Expected fail | Test-first evidence: ODR-003, ODR-004, and G2 packet files did not yet exist. |
 | 2026-08-10 | Gate-packet tests, testing typecheck, and documentation validation | Passed | Controlled privacy, operating, migration, and lawyer-review packets are present; all accountable reviewer outcomes remain unrecorded. |
+| 2026-08-10 | Phase 9 convergence | Findings | Independent convergence found that a legacy relationship row inserted after the lifecycle migration still authorized. Confirmed by probe: `allowed / explicit_relationship` with null membership and grant revisions. Appended T048–T050. |
+| 2026-08-10 | `pnpm --filter @lexgate/database exec vitest run --no-file-parallelism src/authorization.integration.test.ts` | Expected fail | Test-first evidence for T050: 3 failed, 6 passed. The legacy insert resolved instead of rejecting, and the freeze triggers did not exist. |
+| 2026-08-10 | `pnpm db:migrate` then `pnpm --filter @lexgate/database exec vitest run --no-file-parallelism` | Passed | Migration `0012_legacy-relationship-write-freeze` applied; 19 PostgreSQL tests passed across 4 files. |
 
 ## Reviewer-packet evidence
 
@@ -82,7 +85,7 @@ The concise sponsor decision is retained in [sponsor-approval-summary.md](eviden
 
 ## Migration, recovery, and activation posture
 
-- The planned G1 migration is additive. Existing M1 relationship rows remain immutable legacy evidence and cannot be reopened or silently changed.
+- The planned G1 migration is additive. Existing M1 relationship rows remain immutable legacy evidence and cannot be reopened or silently changed. Migration `0012` additionally freezes new writes to them, so the access lifecycle ledger is the only way to create a relationship. The authorization reader still reads them for lifecycle-rollback safety, but a relationship with no effective revision can no longer authorize.
 - A lifecycle code rollback must keep an effective-reader path that continues to deny revoked access; no destructive down migration is authorized.
 - All review packets are templates until an accountable reviewer records an outcome. A template, test pass, or sponsor approval never constitutes gate approval.
 - No exception is requested.

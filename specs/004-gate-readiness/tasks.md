@@ -193,3 +193,11 @@
 
 - [x] T046 Implement and integration-test deterministic rebuilding of effective membership and exact-grant projections from immutable lifecycle ledgers, including a safe no-op/recovery path, per FR-003 and plan: projection decision (partial).
 - [x] T047 Implement and unit-test a provider-neutral verified-principal expiry guard, retaining generic deny behaviour and no provider activation, per US2/SC-002 and FR-004 (partial).
+
+---
+
+## Phase 9: Convergence
+
+- [x] T048 Add a database guard in `packages/database/drizzle/` that rejects new `organization_memberships` and `restricted_resource_access_grants` inserts after the lifecycle migration, so a legacy relationship row cannot create access without a lifecycle event, approval record, requester, and distinct approver, per FR-003 and plan: G1 decision 6 / data-model "Effective projections own all future authorization reads" (contradicts). Retain the existing read fallback, which `verification.md` requires for lifecycle-rollback safety.
+- [x] T049 Record the effective membership/grant revision on every allowed decision in `packages/database/src/authorization.ts`, or deny when no revision evidence can be established, so no allowed decision is written with a null revision reference, per plan: G1 decision 8 (partial).
+- [x] T050 Add negative authorization coverage in `packages/database/src/authorization.integration.test.ts` for the legacy relationship path, pinning that a post-migration legacy insert is rejected and that any decision reached through the legacy reader carries traceable revision evidence, per SC-002 and Constitution VI (missing).

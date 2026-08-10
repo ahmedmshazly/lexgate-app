@@ -192,11 +192,21 @@ export const createRestrictedResourceAuthorizationPort = (
               (grant.expiresAt === null || grant.expiresAt > authorizationTime),
           }))
         : legacyGrants;
-      const decision = evaluateRestrictedResourceAccess({
+      const evaluated = evaluateRestrictedResourceAccess({
         request,
         membership: membership ?? null,
         grants,
       });
+      // Every allowed decision must name the effective membership and grant
+      // revisions it relied on. A legacy relationship that predates the
+      // lifecycle freeze carries no revision, so it can be read for rollback
+      // safety but can never authorize.
+      const hasRevisionEvidence =
+        effectiveMembership !== undefined && effectiveGrants.length > 0;
+      const decision =
+        evaluated.outcome === "allowed" && !hasRevisionEvidence
+          ? ({ outcome: "denied", reason: "not_authorized" } as const)
+          : evaluated;
 
       await transaction.insert(authorizationDecisions).values({
         id: request.decisionId,

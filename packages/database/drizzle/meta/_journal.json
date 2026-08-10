@@ -85,6 +85,13 @@
       "when": 1786321049142,
       "tag": "0011_low_angel",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1786321149142,
+      "tag": "0012_legacy-relationship-write-freeze",
+      "breakpoints": true
     }
   ]
 }

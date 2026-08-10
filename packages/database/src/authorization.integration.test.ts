@@ -4,7 +4,7 @@ import type {
   AccessLifecycleScope,
 } from "@lexgate/domain";
 import { deriveAccessLifecycleTransition } from "@lexgate/domain";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
@@ -15,6 +15,8 @@ import {
   authorizationDecisions,
   effectiveRestrictedResourceAccessGrants,
   membershipLifecycleEvents,
+  organizationMemberships,
+  restrictedResourceAccessGrants,
   restrictedResourceAccessLifecycleEvents,
 } from "./schema.js";
 
@@ -189,6 +191,47 @@ const createFixture = () => {
 };
 
 let fixture: ReturnType<typeof createFixture>;
+
+/**
+ * Writes a legacy relationship the way it could only have been written before
+ * the lifecycle freeze, by suspending the freeze triggers for the insert. This
+ * reproduces historical rows without reopening the write path in product code.
+ */
+const seedPreFreezeLegacyRelationship = async (): Promise<void> => {
+  await database.execute(
+    sql`alter table organization_memberships disable trigger organization_memberships_insert_frozen`,
+  );
+  await database.execute(
+    sql`alter table restricted_resource_access_grants disable trigger restricted_resource_access_grants_insert_frozen`,
+  );
+  try {
+    await database.insert(organizationMemberships).values({
+      id: crypto.randomUUID(),
+      accountId: fixture.accountId,
+      organizationId: fixture.organizationId,
+      systemRole: "synthetic-staff",
+      isActive: true,
+      createdAt: occurredAt,
+    });
+    await database.insert(restrictedResourceAccessGrants).values({
+      id: crypto.randomUUID(),
+      accountId: fixture.accountId,
+      organizationId: fixture.organizationId,
+      resourceType: fixture.resource.type,
+      resourceId: fixture.resource.id,
+      operation: "view",
+      isActive: true,
+      grantedAt: occurredAt,
+    });
+  } finally {
+    await database.execute(
+      sql`alter table organization_memberships enable trigger organization_memberships_insert_frozen`,
+    );
+    await database.execute(
+      sql`alter table restricted_resource_access_grants enable trigger restricted_resource_access_grants_insert_frozen`,
+    );
+  }
+};
 
 describe("PostgreSQL restricted-resource authorization", () => {
   beforeEach(() => {
@@ -420,5 +463,90 @@ describe("PostgreSQL restricted-resource authorization", () => {
 
     expect(retainedEvidence).toHaveLength(0);
     expect(retainedGrants).toHaveLength(1);
+  });
+
+  it("freezes new legacy relationship writes so access cannot bypass the lifecycle ledger", async () => {
+    await expect(
+      database.insert(organizationMemberships).values({
+        id: crypto.randomUUID(),
+        accountId: fixture.accountId,
+        organizationId: fixture.organizationId,
+        systemRole: "synthetic-staff",
+        isActive: true,
+        createdAt: occurredAt,
+      }),
+    ).rejects.toThrow();
+
+    await expect(
+      database.insert(restrictedResourceAccessGrants).values({
+        id: crypto.randomUUID(),
+        accountId: fixture.accountId,
+        organizationId: fixture.organizationId,
+        resourceType: fixture.resource.type,
+        resourceId: fixture.resource.id,
+        operation: "view",
+        isActive: true,
+        grantedAt: occurredAt,
+      }),
+    ).rejects.toThrow();
+
+    const memberships = await database
+      .select()
+      .from(organizationMemberships)
+      .where(eq(organizationMemberships.accountId, fixture.accountId));
+    const grants = await database
+      .select()
+      .from(restrictedResourceAccessGrants)
+      .where(eq(restrictedResourceAccessGrants.accountId, fixture.accountId));
+
+    expect(memberships).toEqual([]);
+    expect(grants).toEqual([]);
+  });
+
+  it("denies a legacy relationship that predates the freeze because it carries no revision evidence", async () => {
+    // Simulates rows written before the lifecycle freeze. They can still be
+    // read for rollback safety, but they must never authorize, because no
+    // lifecycle event, approval, requester, or approver stands behind them.
+    await seedPreFreezeLegacyRelationship();
+    const input = fixture.request();
+
+    await expect(authorization.evaluate(input)).resolves.toEqual({
+      outcome: "denied",
+      reason: "not_authorized",
+    });
+
+    const [decision] = await database
+      .select()
+      .from(authorizationDecisions)
+      .where(eq(authorizationDecisions.id, input.decisionId));
+
+    expect(decision).toMatchObject({
+      outcome: "denied",
+      reason: "not_authorized",
+      membershipRevision: null,
+      grantRevision: null,
+    });
+  });
+
+  it("never records an allowed decision without traceable revision evidence", async () => {
+    await fixture.seedMembership();
+    await fixture.seedExactGrant();
+    await seedPreFreezeLegacyRelationship();
+
+    await authorization.evaluate(fixture.request());
+
+    const allowedWithoutEvidence = await database
+      .select()
+      .from(authorizationDecisions)
+      .where(
+        and(
+          eq(authorizationDecisions.accountId, fixture.accountId),
+          eq(authorizationDecisions.organizationId, fixture.organizationId),
+          eq(authorizationDecisions.outcome, "allowed"),
+          sql`(${authorizationDecisions.membershipRevision} is null or ${authorizationDecisions.grantRevision} is null)`,
+        ),
+      );
+
+    expect(allowedWithoutEvidence).toEqual([]);
   });
 });
