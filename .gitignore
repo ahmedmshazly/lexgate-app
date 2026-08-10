@@ -11,3 +11,7 @@ test-results/
 !.env.example
 *.log
 .DS_Store
+# Brand source bundle. Deliberately not committed (decision D-007): the curated
+# assets live in packages/brand with a checksum manifest, which preserves
+# verifiable provenance without putting 31 MB of unused sources in every clone.
+Brand Identity Upgrade Request*
