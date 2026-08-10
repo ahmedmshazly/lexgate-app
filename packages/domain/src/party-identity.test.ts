@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  assertSyntheticValue,
   createNeutralPartyMutation,
   flagPossibleDuplicateMutation,
   PartyIdentityValidationError,
@@ -220,5 +221,52 @@ describe("party identity domain model", () => {
         occurredAt,
       }),
     ).toThrow(PartyIdentityValidationError);
+  });
+});
+
+describe("synthetic-value control (PRV-MIN-001)", () => {
+  it("rejects a value shaped like a national identifier", () => {
+    expect(() =>
+      assertSyntheticValue("29801011234567", "Contact value"),
+    ).toThrow(PartyIdentityValidationError);
+  });
+
+  it("rejects a reachable email address", () => {
+    expect(() =>
+      assertSyntheticValue("someone@gmail.com", "Contact value"),
+    ).toThrow(PartyIdentityValidationError);
+  });
+
+  it("rejects a dialable telephone number", () => {
+    expect(() =>
+      assertSyntheticValue("+20 100 123 4567", "Contact value", "phone"),
+    ).toThrow(PartyIdentityValidationError);
+  });
+
+  it("does not count digits in a value that is not a telephone number", () => {
+    // A synthetic address carrying a UUID has well over seven digits. A blunt
+    // digit count would reject it, and only for some UUIDs.
+    expect(() =>
+      assertSyntheticValue(
+        "synthetic-3f2504e0-4f89-41d3-9a0c-0305e82c3301@example.test",
+        "Contact value",
+        "email",
+      ),
+    ).not.toThrow();
+  });
+
+  it("permits reserved documentation domains used by fixtures", () => {
+    expect(() =>
+      assertSyntheticValue("synthetic.contact@example.test", "Contact value"),
+    ).not.toThrow();
+  });
+
+  it("permits an ordinary synthetic name in either script", () => {
+    expect(() =>
+      assertSyntheticValue("أحمد اختبار", "Name value"),
+    ).not.toThrow();
+    expect(() =>
+      assertSyntheticValue("Ahmed Ekhtibar", "Name value"),
+    ).not.toThrow();
   });
 });

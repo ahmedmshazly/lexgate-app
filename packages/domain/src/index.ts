@@ -46,6 +46,7 @@ export {
   validatePossibleDuplicate,
   validatePrimaryNameAssignment,
   validateRepresentationClaim,
+  assertSyntheticValue,
   validateSyntheticPrivacyHandlingMetadata,
   type AssertionReviewState,
   type CreateNeutralPartyInput,

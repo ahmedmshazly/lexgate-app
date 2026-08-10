@@ -203,6 +203,54 @@ const assertDate = (value: Date, label: string): void => {
   }
 };
 
+/**
+ * Domains reserved by the IETF for documentation and testing. An address at
+ * one of these cannot reach a real mailbox, so it is safe in a fixture.
+ */
+const reservedEmailDomains =
+  /@([a-z0-9-]+\.)*(test|example|invalid|localhost)$|@example\.(com|net|org)$/i;
+
+/**
+ * Rejects content shaped like real personal data.
+ *
+ * The synthetic-only posture was previously a classification label validated
+ * on the metadata while the value itself went uninspected, so nothing stopped
+ * a real name, national identifier, or contact point being written. A label
+ * asserted by the caller is not a control; this is.
+ *
+ * It is deliberately shape-based and therefore imperfect — it cannot tell a
+ * real name from an invented one. It exists to stop the accidents that are
+ * detectable: identifiers, reachable addresses, and dialable numbers.
+ */
+export const assertSyntheticValue = (
+  value: string,
+  label: string,
+  kind: "email" | "phone" | "other" = "other",
+): void => {
+  // Egyptian national identifiers are 14 digits.
+  if (/(?:\D|^)\d{14}(?:\D|$)/.test(value)) {
+    throw new PartyIdentityValidationError(
+      `${label} looks like a real national identifier. Only synthetic values may be stored.`,
+    );
+  }
+  if (value.includes("@") && !reservedEmailDomains.test(value.trim())) {
+    throw new PartyIdentityValidationError(
+      `${label} looks like a reachable email address. Use a reserved domain such as example.test.`,
+    );
+  }
+  // Only applied to values declared as telephone numbers. Counting digits
+  // across any value would reject a synthetic address carrying a UUID, and
+  // would do so only for some UUIDs — a flaky control is worse than none.
+  if (kind === "phone") {
+    const digitsOnly = value.replace(/\D/g, "");
+    if (/\+20\d/.test(value) || digitsOnly.length >= 7) {
+      throw new PartyIdentityValidationError(
+        `${label} looks like a dialable telephone number. Only synthetic values may be stored.`,
+      );
+    }
+  }
+};
+
 export const validateSyntheticPrivacyHandlingMetadata = (
   input: SyntheticPrivacyHandlingMetadata,
 ): void => {
@@ -229,6 +277,7 @@ export const validateSyntheticPrivacyHandlingMetadata = (
 export const validatePartyNameForm = (input: PartyNameFormInput): void => {
   assertUuid(input.id, "Name form ID");
   assertNonEmpty(input.value, "Name value");
+  assertSyntheticValue(input.value, "Name value");
   assertNonEmpty(input.languageTag, "Name language tag");
   assertOneOf(input.formType, partyNameFormTypes, "Name form type");
   assertOneOf(input.reviewState, assertionReviewStates, "Name review state");
@@ -263,6 +312,13 @@ export const validatePrimaryNameAssignment = (
 export const validatePartyContact = (input: PartyContactInput): void => {
   assertUuid(input.id, "Contact ID");
   assertNonEmpty(input.value, "Contact value");
+  assertSyntheticValue(
+    input.value,
+    "Contact value",
+    input.contactType === "email" || input.contactType === "phone"
+      ? input.contactType
+      : "other",
+  );
   assertNonEmpty(input.operationalPurpose, "Contact operational purpose");
   assertOneOf(input.contactType, partyContactTypes, "Contact type");
   assertOneOf(input.reviewState, assertionReviewStates, "Contact review state");
