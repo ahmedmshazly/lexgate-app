@@ -95,3 +95,14 @@ export {
   eraseSubjectCommand,
   mayDestroyRecord,
 } from "./records-lifecycle.js";
+
+export type {
+  ConflictCandidateActor,
+  ConflictCandidateAuthorizationPort,
+  ConflictCandidateOutcome,
+  ConflictCandidateSearchPort,
+} from "./conflict-candidates.js";
+export {
+  candidateRationale,
+  searchConflictCandidates,
+} from "./conflict-candidates.js";
