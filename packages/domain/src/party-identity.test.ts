@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   assertSyntheticValue,
+  validatePossibleDuplicate,
+  duplicateDispositions,
   createNeutralPartyMutation,
   flagPossibleDuplicateMutation,
   PartyIdentityValidationError,
@@ -198,6 +200,7 @@ describe("party identity domain model", () => {
         id: ids.duplicate,
         firstPartyId: ids.party,
         secondPartyId: ids.otherParty,
+        matchRationale: "synthetic_name_similarity",
         reviewState: "unreviewed",
         privacy,
       },
@@ -215,6 +218,7 @@ describe("party identity domain model", () => {
           id: "00000000-0000-4000-8000-000000000319",
           firstPartyId: ids.otherParty,
           secondPartyId: ids.party,
+          matchRationale: "synthetic_name_similarity",
           reviewState: "unreviewed",
           privacy,
         },
@@ -268,5 +272,45 @@ describe("synthetic-value control (PRV-MIN-001)", () => {
     expect(() =>
       assertSyntheticValue("Ahmed Ekhtibar", "Name value"),
     ).not.toThrow();
+  });
+});
+
+describe("duplicate flags carry a rationale and a disposition (G2)", () => {
+  const duplicate = {
+    id: "00000000-0000-4000-8000-0000000005a1",
+    firstPartyId: "00000000-0000-4000-8000-0000000005a2",
+    secondPartyId: "00000000-0000-4000-8000-0000000005a3",
+    matchRationale: "synthetic_name_similarity",
+    reviewState: "unreviewed" as const,
+    privacy,
+  };
+
+  it("rejects a flag with no stated reason for being raised", () => {
+    expect(() =>
+      validatePossibleDuplicate({ ...duplicate, matchRationale: "  " }),
+    ).toThrow(PartyIdentityValidationError);
+  });
+
+  it("refuses a conclusion on a pair nobody has reviewed", () => {
+    // A disposition recorded without a review is the shape of an automatic
+    // clearance, which G2 forbids outright.
+    expect(() =>
+      validatePossibleDuplicate({
+        ...duplicate,
+        disposition: "confirmed_distinct_parties",
+      }),
+    ).toThrow(PartyIdentityValidationError);
+  });
+
+  it("accepts each conclusion a human reviewer can actually reach", () => {
+    for (const disposition of duplicateDispositions) {
+      expect(() =>
+        validatePossibleDuplicate({
+          ...duplicate,
+          reviewState: "reviewed",
+          disposition,
+        }),
+      ).not.toThrow();
+    }
   });
 });

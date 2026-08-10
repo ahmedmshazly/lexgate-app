@@ -494,6 +494,13 @@ export const partyPossibleDuplicateFlags = pgTable(
     firstPartyId: uuid("first_party_id").notNull(),
     secondPartyId: uuid("second_party_id").notNull(),
     reviewState: text("review_state").notNull(),
+    // Why this pair was raised. Without it every flag looks identical to a
+    // reviewer, whatever prompted it.
+    matchRationale: text("match_rationale").notNull(),
+    // What the reviewer concluded, distinct from whether they looked. A
+    // "reviewed" flag with no disposition cannot tell a careful judgement
+    // from a click-through under alert fatigue.
+    disposition: text("disposition"),
     processingPurpose: text("processing_purpose").notNull(),
     dataClassification: text("data_classification").notNull(),
     subjectCategory: text("subject_category").notNull(),

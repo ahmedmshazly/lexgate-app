@@ -597,6 +597,8 @@ export const createPartyIdentityPersistencePort = (
           firstPartyId: input.command.duplicate.firstPartyId,
           secondPartyId: input.command.duplicate.secondPartyId,
           reviewState: input.command.duplicate.reviewState,
+          matchRationale: input.command.duplicate.matchRationale,
+          disposition: input.command.duplicate.disposition ?? null,
           ...privacyValues(input.command.duplicate.privacy),
           recordedAt: input.command.occurredAt,
           recordedByAccountId: input.actor.accountId,

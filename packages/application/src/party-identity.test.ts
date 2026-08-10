@@ -296,6 +296,7 @@ describe("party identity application commands", () => {
             id: "00000000-0000-4000-8000-000000000409",
             firstPartyId: personPartyId,
             secondPartyId: organizationPartyId,
+            matchRationale: "synthetic_name_similarity",
             reviewState: "unreviewed",
             privacy,
           },

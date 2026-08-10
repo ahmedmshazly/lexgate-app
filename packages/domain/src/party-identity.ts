@@ -96,11 +96,27 @@ export type RepresentationClaimInput = Readonly<{
   supersedesClaimId?: string;
 }>;
 
+/**
+ * What a reviewer concluded about a flagged pair, distinct from whether they
+ * looked. None of these clears a conflict — that is a lawyer's decision under
+ * G2, not a data state.
+ */
+export const duplicateDispositions = [
+  "confirmed_same_party",
+  "confirmed_distinct_parties",
+  "insufficient_information",
+] as const;
+export type DuplicateDisposition = (typeof duplicateDispositions)[number];
+
 export type PossibleDuplicateInput = Readonly<{
   id: string;
   firstPartyId: string;
   secondPartyId: string;
   reviewState: AssertionReviewState;
+  /** Why the pair was raised. A flag with no rationale is unreviewable. */
+  matchRationale: string;
+  /** Set only once a reviewer has reached a conclusion. */
+  disposition?: DuplicateDisposition;
   privacy: SyntheticPrivacyHandlingMetadata;
 }>;
 
@@ -393,6 +409,20 @@ export const validatePossibleDuplicate = (
     assertionReviewStates,
     "Possible-duplicate review state",
   );
+  assertNonEmpty(input.matchRationale, "Possible-duplicate match rationale");
+  if (input.disposition !== undefined) {
+    assertOneOf(
+      input.disposition,
+      duplicateDispositions,
+      "Possible-duplicate disposition",
+    );
+    // A conclusion cannot precede the review that reached it.
+    if (input.reviewState === "unreviewed") {
+      throw new PartyIdentityValidationError(
+        "An unreviewed possible duplicate cannot carry a disposition.",
+      );
+    }
+  }
   validateSyntheticPrivacyHandlingMetadata(input.privacy);
 
   if (input.firstPartyId >= input.secondPartyId) {
