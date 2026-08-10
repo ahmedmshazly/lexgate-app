@@ -136,7 +136,11 @@ importers:
 
   packages/observability: {}
 
-  packages/testing: {}
+  packages/testing:
+    devDependencies:
+      "@lexgate/domain":
+        specifier: workspace:*
+        version: link:../domain
 
   packages/ui:
     dependencies:

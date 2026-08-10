@@ -134,3 +134,25 @@ export {
   isResourceHeld,
   RecordsLifecycleValidationError,
 } from "./records-lifecycle.js";
+
+export type { NamePartMatch } from "./arabic-names.js";
+export {
+  canonicalNamePart,
+  canonicalNameParts,
+  compareNameParts,
+  containsArabicScript,
+  normalizeNameText,
+  splitNameParts,
+} from "./arabic-names.js";
+export type {
+  CandidateTier,
+  ConflictCandidate,
+  NamePartEvidence,
+} from "./conflict-candidates.js";
+export {
+  compareNames,
+  evaluateNameCandidate,
+  findConflictCandidates,
+  namesAreCanonicallyIdentical,
+  sharedPartsAcrossPositions,
+} from "./conflict-candidates.js";
