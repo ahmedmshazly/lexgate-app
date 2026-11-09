@@ -171,7 +171,6 @@ traceability:
     gate: G0
   - requirement: QLT-EVD-001
     architecture: [LG-DEV-002]
-    implementation:
-      [CONSTITUTION.md, docs/development, specs]
+    implementation: [CONSTITUTION.md, docs/development, specs]
     evidence: [docs:quality-engineering-standard]
     gate: G0

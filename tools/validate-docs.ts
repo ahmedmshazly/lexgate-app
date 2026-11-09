@@ -178,7 +178,7 @@ export const validateDocumentation = async (
     "requirements/requirements.yaml",
     "requirements/traceability.yaml",
     "architecture/DOMAIN_DATA_ARCHITECTURE.md",
-        "development/QUALITY_ENGINEERING_STANDARD.md",
+    "development/QUALITY_ENGINEERING_STANDARD.md",
     "brand/BRAND_SYSTEM.md",
     "archive/pre-docs-2026-08-09/README.md",
   ]) {
