@@ -2,7 +2,7 @@
 
 These assets are copied unchanged from `Brand Identity Upgrade Request (1)/archive/01_Logos/SVG/` for application use.
 
-**[`provenance.json`](provenance.json) is the authority for what each asset is and where it came from.** It records the approved source filename, a SHA-256 of the committed file, the intended use, and the licence for every curated mark and typeface, and a test recomputes each digest so an altered or substituted asset fails rather than passing unnoticed. This page is an orientation summary; where the two differ, the manifest wins.
+**[`provenance.json`](provenance.json) is the authority for what each asset is and where it came from.** It records the approved source filename, a SHA-256 of the committed file, the intended use, and the licence for every curated mark and typeface, and a test recomputes each digest so an altered or substituted asset fails rather than passing unnoticed. This page is an orientation summary, and where the two differ, the manifest wins.
 
 | Asset                   | Source                                        | Intended use                         |
 | ----------------------- | --------------------------------------------- | ------------------------------------ |

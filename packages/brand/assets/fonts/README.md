@@ -11,7 +11,7 @@ application and design-system rendering do not depend on a third-party font host
 | `Noto Naskh Arabic`    | Arabic display / editorial  |
 | `IBM Plex Mono`        | Metadata                    |
 
-Load them with `@import "./fonts.css";` — every `src:` is a relative path inside this directory.
+Load them with `@import "./fonts.css";`, every `src:` is a relative path inside this directory.
 
 Subsets are deliberately narrow: `latin` + `latin-ext` for the Latin families, `arabic` + `latin` for the Arabic
 families. Weights are limited to those the brand system actually calls for. Regenerate rather than hand-edit:

@@ -22,7 +22,7 @@ Arabic primary text and official publication control. A web page may confirm a r
 ## Review sequence
 
 1. Acquire and hash the official Arabic primary text and amendment/effective-date evidence.
-2. Extract only platform-relevant provisions; link them to source IDs and requirement IDs.
-3. Obtain the assigned Egyptian reviewer’s interpretation and scope limits.
+2. Extract only platform-relevant provisions, and link them to source IDs and requirement IDs.
+3. Get the assigned Egyptian reviewer’s interpretation and scope limits.
 4. Update `requirements.yaml`, validation gates, and the release packet.
 5. Recheck before any related public, provider, or production activation.

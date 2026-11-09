@@ -11,7 +11,7 @@ Every canonical Markdown document must declare its document ID, title, owner, st
 
 ## Change control
 
-Material changes require: a concise rationale; affected requirement IDs; affected source IDs; risk tier; approving owner; validation impact; and a traceability update. A source refresh does not itself approve a legal interpretation or production activation.
+Material changes require a concise rationale, affected requirement IDs, affected source IDs, risk tier, approving owner, validation impact, and a traceability update. A source refresh does not itself approve a legal interpretation or production activation.
 
 ## Classification
 
@@ -26,4 +26,4 @@ Do not place real client information, credentials, private legal advice, or prod
 
 ## Authority hierarchy
 
-Controlling Arabic legal source → approved legal interpretation → canonical SRS and structured records → approved ADR/SOP → implementation documentation. Conflicts are recorded, not resolved by convenience.
+Controlling Arabic legal source → approved legal interpretation → canonical SRS and structured records → approved ADR/SOP → implementation documentation. Conflicts get recorded, not resolved by convenience.

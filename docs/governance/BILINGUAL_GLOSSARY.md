@@ -16,4 +16,4 @@
 | Restricted matter      | ملف مقيّد              | Matter requiring additional access controls.                                    |
 | Professional authority | الصفة / السلطة المهنية | Legally or professionally permitted authority, separate from system role.       |
 
-Arabic primary legal texts control where applicable. This glossary is not a substitute for source-specific legal interpretation.
+Arabic primary legal texts control where applicable. This glossary does not replace source-specific legal interpretation.
