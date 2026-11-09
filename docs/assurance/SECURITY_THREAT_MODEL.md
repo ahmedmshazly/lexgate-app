@@ -6,7 +6,7 @@
 
 ## Security objectives
 
-Protect confidentiality, integrity, availability, accountability, and recoverability of client, prospect, employee, legal, financial, and operational information. Matter isolation has priority over generic application convenience.
+Protect confidentiality, integrity, availability, accountability, and recoverability of client, prospect, employee, legal, financial, and operational information. Matter isolation comes before generic application convenience.
 
 ## Principal threats and controls
 

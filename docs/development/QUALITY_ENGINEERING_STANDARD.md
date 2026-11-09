@@ -18,7 +18,7 @@ Lex Gate requires professional, auditable engineering quality regardless of who 
 1. A smaller or less experienced team never receives a lower quality threshold. It must make a smaller vertical slice, use the canonical artifacts, collect tool evidence, ask a targeted question, or block the affected work.
 2. An implementer must not invent legal, architectural, operational, test, or validation evidence. Unknowns are recorded in `OPEN_DECISIONS.md` or the feature verification record with a safe interim position.
 3. A feature is spec-anchored: `spec.md`, `plan.md`, `tasks.md`, and `verification.md` are retained with the feature and updated when scope or evidence changes.
-4. A retry produces diagnostic evidence only. Focused, skipped, disabled, flaky, or weakened tests do not satisfy their original acceptance obligation without a documented approved exception and equivalent control.
+4. A retry produces diagnostic evidence only. Focused, skipped, disabled, flaky, or weakened tests do not satisfy their original acceptance obligation without a recorded, approved exception and equivalent control.
 5. Test fixtures, screenshots, logs, browser state, exports, and evidence remain synthetic and classified. Real client, matter, credential, national-ID, or production information is prohibited.
 
 ## Risk-based evidence matrix
@@ -47,7 +47,7 @@ Before handoff, create or update `specs/<feature>/verification.md` with:
 
 ## Required quality gates
 
-`pnpm verify` is the minimum repository gate. `pnpm verify:full` is required for material runtime, dependency, database, UI, delivery, or CI changes and runs production build plus browser validation. Pull requests execute the full gate in CI. Automated accessibility checks find machine-detectable defects; they do not replace manual accessibility assessment.
+`pnpm verify` is the minimum repository gate. `pnpm verify:full` is required for material runtime, dependency, database, UI, delivery, or CI changes and runs production build plus browser validation. Pull requests execute the full gate in CI. Automated accessibility checks find machine-detectable defects, but they do not replace manual accessibility assessment.
 
 ## Execution method
 

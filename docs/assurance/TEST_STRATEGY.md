@@ -22,9 +22,9 @@
 
 ## Test selection and evidence
 
-Every material feature declares the applicable rows of the quality engineering evidence matrix before implementation. Unit, integration, contract, authorization-negative, browser/E2E, accessibility, performance, resilience, backup/restore, and release validation are selected by risk and claim, not omitted because an implementation is inconvenient. A non-applicable layer requires written rationale in the feature verification record; a missing required layer blocks handoff.
+Every material feature declares the applicable rows of the quality engineering evidence matrix before implementation. Unit, integration, contract, authorization-negative, browser/E2E, accessibility, performance, resilience, backup/restore, and release validation are selected by risk and claim, not omitted because an implementation is inconvenient. A non-applicable layer requires written rationale in the feature verification record, and a missing required layer blocks handoff.
 
-Automated accessibility scans cover machine-detectable WCAG defects only. Browser-facing releases additionally require proportional manual keyboard, screen-reader, and inclusive-user review evidence at their applicable validation gate.
+Automated accessibility scans cover machine-detectable WCAG defects only. Browser-facing releases also require proportional manual keyboard, screen-reader, and inclusive-user review evidence at their applicable validation gate.
 
 ## Fixture policy
 

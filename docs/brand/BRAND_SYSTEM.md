@@ -12,7 +12,7 @@ Lex Gate is a serious law firm with exceptionally good digital systems, not a so
 ## Identity decisions
 
 - **Primary digital mark:** Portal.
-- **Alternate controlled marks:** Keystone and Seal; use only in documented contexts.
+- **Alternate controlled marks:** Keystone and Seal, use only in recorded contexts.
 - **Primary lockup:** Horizontal mark/wordmark lockup.
 - **Working languages:** English and Arabic, with direction and typography appropriate to each.
 - **Client-facing default surface:** Formal Ivory; restricted material must retain persistent classification, not merely decorative color.
@@ -41,4 +41,4 @@ All color choices need text/icon/pattern reinforcement where meaning is material
 
 ## Asset provenance
 
-The supplied `Brand Identity Upgrade Request (1)` directory remains the source bundle. Curated production-safe assets and code tokens are exposed by `packages/brand`; do not edit legacy vectors or substitute unlicensed marks/fonts.
+The supplied `Brand Identity Upgrade Request (1)` directory remains the source bundle. Curated production-safe assets and code tokens are exposed by `packages/brand`; do not edit the older vectors or substitute unlicensed marks/fonts.
