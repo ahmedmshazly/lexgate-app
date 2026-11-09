@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Capture Lex Gate’s real operating model before permanently configuring practice areas, matter taxonomy, authority, communications, finance, migration, and retention behavior. Generic foreign law-firm patterns are not evidence.
+Capture how Lex Gate really operates before permanently configuring practice areas, matter taxonomy, authority, communications, finance, migration, and retention behavior. Generic foreign law-firm patterns are not evidence.
 
 ## Required evidence
 
@@ -21,4 +21,4 @@ Use structured interviews, observed workflow walkthroughs, redacted sample artif
 
 ## Conversion rule
 
-Every finding becomes one of: confirmed fact, validated need, proposed design, rejected assumption, risk, or open decision. A finding does not alter canonical requirements until reviewed by its accountable owner.
+Every finding becomes one of: confirmed fact, validated need, proposed design, rejected assumption, risk, or open decision. A finding does not change canonical requirements until its accountable owner reviews it.

@@ -1,10 +1,10 @@
 # Lex Gate Documentation
 
-This directory is the controlled, implementation-facing documentation set. It supersedes the numbered documents preserved under [`archive/pre-docs-2026-08-09`](archive/pre-docs-2026-08-09/README.md).
+This directory is the controlled, implementation-facing documentation set. It replaces the numbered documents kept under [`archive/pre-docs-2026-08-09`](archive/pre-docs-2026-08-09/README.md).
 
 ## Authority and reading order
 
-1. [`requirements/MASTER_SRS.md`](requirements/MASTER_SRS.md) — canonical product and engineering requirements.
+1. [`requirements/MASTER_SRS.md`](requirements/MASTER_SRS.md): canonical product and engineering requirements.
 2. Structured requirement, traceability, capability, release, and validation records in `requirements/`.
 3. Approved architecture decisions in `decisions/` and architecture documents in `architecture/`.
 4. Assurance, delivery, and operating documentation.
@@ -27,10 +27,10 @@ This directory is the controlled, implementation-facing documentation set. It su
 
 ## Status vocabulary
 
-- **Approved** — decision or interpretation signed by the accountable owner.
-- **Proposed** — intended baseline that may guide reversible foundation work.
-- **Validated** — supported by recorded evidence for its stated scope.
-- **Blocked** — cannot be implemented or activated until its validation gate passes.
-- **Superseded** — retained only for traceability.
+- **Approved**: decision or interpretation signed by the accountable owner.
+- **Proposed**: intended baseline that may guide reversible foundation work.
+- **Validated**: supported by recorded evidence for its stated scope.
+- **Blocked**: cannot be implemented or activated until its validation gate passes.
+- **Superseded**: retained only for traceability.
 
 No status applies across legal, operational, and technical contexts unless the document explicitly says so.

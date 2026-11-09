@@ -1,6 +1,6 @@
 # Lex Gate Engineering Constitution
 
-Read `docs/README.md` and the task-relevant canonical requirement records before changing code or documentation. The repository is the durable source of truth; conversations are not.
+Read `docs/README.md` and the task-relevant canonical requirement records before changing code or documentation. The repository is the durable source of truth, conversations are not.
 
 ## Authority
 
@@ -10,7 +10,7 @@ Read `docs/README.md` and the task-relevant canonical requirement records before
 4. This file and scoped instructions
 5. Task plan and existing implementation conventions
 
-Lower-priority material must not weaken a higher-priority control. Record unresolved material questions in `docs/governance/OPEN_DECISIONS.md`; continue unrelated work where safe.
+Lower-priority material must not weaken a higher-priority control. Record unresolved material questions in `docs/governance/OPEN_DECISIONS.md`, then continue unrelated work where safe.
 
 ## Core invariants
 
@@ -24,7 +24,7 @@ Lower-priority material must not weaken a higher-priority control. Record unreso
 
 ## Engineering rules
 
-- Use explicit commands for material transitions; do not replace them with generic status PATCH routes.
+- Use explicit commands for material transitions, and do not replace them with generic status PATCH routes.
 - Keep domain rules independent from Next.js, databases, and provider SDKs.
 - Use server-side projections for client-facing data. Browser field hiding is not authorization.
 - Use synthetic fixtures only. Never commit credentials, national IDs, production exports, legal files, or client data.
@@ -37,7 +37,7 @@ Lower-priority material must not weaken a higher-priority control. Record unreso
 - Select every applicable test layer: static/documentation, domain, integration, authorization-negative, contract, browser/E2E, accessibility, operational, and release-gate validation. A test layer may be marked not applicable only with a concrete rationale in feature verification evidence.
 - Use production-equivalent execution for browser acceptance checks in CI. Automated accessibility scans complement, but never replace, manual accessibility assessment and inclusive user review.
 - A retry is diagnostic evidence, not permission to ignore flakiness. Focused, skipped, disabled, or weakened tests require an explicit, approved reason and an equivalent protection where applicable.
-- Read `docs/development/QUALITY_ENGINEERING_STANDARD.md` before material implementation. It defines the required evidence profile and escalation path.
+- Read `docs/development/QUALITY_ENGINEERING_STANDARD.md` before material implementation. It sets out the required evidence profile and the escalation path.
 
 ## Completion
 

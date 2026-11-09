@@ -14,10 +14,10 @@ At each transition the system must distinguish client-visible information, inter
 
 - The client experience must reflect the real service state but not expose internal strategy or unreviewed legal conclusions.
 - Every material promise, deadline, handoff, and exception has an accountable human owner.
-- Automation may prepare, route, remind, and record; it may not make restricted legal decisions.
+- Automation may prepare, route, remind, and record, but it may not make restricted legal decisions.
 - Communication failures escalate rather than creating a false record that the client was informed.
 - Closure never bypasses active procedural, financial, retention, legal-hold, or complaint obligations.
 
 ## Operating channels
 
-Public website, portal, telephone, email, SMS, WhatsApp, physical office, and paper records use the same canonical state and audit principles. A channel may be disabled where its privacy, regulatory, or operational validation is incomplete.
+Public website, portal, telephone, email, SMS, WhatsApp, physical office, and paper records use the same canonical state and audit principles. A channel may be turned off where its privacy, regulatory, or operational validation is incomplete.

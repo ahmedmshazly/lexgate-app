@@ -17,11 +17,11 @@ Lex Gate gives clients a clear, secure engagement experience and gives legal pro
 
 ## User groups
 
-Prospective client, client representative, client user, lawyer, supervising lawyer, legal assistant, operations staff, finance staff, records/privacy staff, security/technical administrator, and external provider. Job title never by itself determines access or professional authority.
+Prospective client, client representative, client user, lawyer, supervising lawyer, legal assistant, operations staff, finance staff, records/privacy staff, security/technical administrator, and external provider. A job title never decides access or professional authority by itself.
 
 ## Scope discipline
 
-The future product includes intake through closure, public content, internal practice operations, client collaboration, finance, records, privacy, reporting, and approved integrations. It does not attempt to replace professional judgment, a court system, a tax adviser, or a regulator.
+The future product includes intake through closure, public content, internal practice operations, client collaboration, finance, records, privacy, reporting, and approved integrations. It does not try to replace professional judgment, a court system, a tax adviser, or a regulator.
 
 ## Success measures
 
