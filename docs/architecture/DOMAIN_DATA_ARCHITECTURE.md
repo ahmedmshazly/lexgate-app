@@ -27,7 +27,7 @@ Use opaque immutable identifiers, separate human business references, UTC instan
 
 ## Material commands
 
-Future modules use commands such as `CompleteConflictReview`, `ActivateEngagement`, `OpenMatter`, `ConfirmLegalDeadline`, `PublishDocumentToClient`, `IssueInvoice`, `CloseMatter`, and `ApproveRecordDestruction`. Generic status update endpoints are prohibited for those transitions.
+Future modules use commands like `CompleteConflictReview`, `ActivateEngagement`, `OpenMatter`, `ConfirmLegalDeadline`, `PublishDocumentToClient`, `IssueInvoice`, `CloseMatter`, and `ApproveRecordDestruction`. Generic status update endpoints are prohibited for those transitions.
 
 ## M0 data boundary
 

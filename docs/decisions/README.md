@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-ADRs record enduring choices, their rationale, consequences, owner, review trigger, and supersession. They are not substitutes for implementation notes.
+ADRs record long-lived choices, their rationale, consequences, owner, review trigger, and supersession. They do not replace implementation notes.
 
 | ADR     | Decision                                    | Status   |
 | ------- | ------------------------------------------- | -------- |

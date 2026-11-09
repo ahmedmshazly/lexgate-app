@@ -26,8 +26,8 @@ flowchart LR
 - `packages/domain` contains types, invariants, commands, and domain events with no Next.js, database, or provider imports.
 - `packages/application` coordinates authorization, transactions, projections, and ports.
 - `packages/database`, `integrations`, `auth`, and `observability` implement ports at the boundary.
-- PostgreSQL is canonical state. Files belong in private object storage; only metadata and immutable references belong in relational state.
-- Side effects are committed through an outbox; workers may retry delivery but do not silently rewrite domain facts.
+- PostgreSQL is canonical state. Files belong in private object storage, and only metadata and immutable references belong in relational state.
+- Side effects are committed through an outbox, workers may retry delivery but do not silently rewrite domain facts.
 
 ## Trust boundaries
 

@@ -6,7 +6,7 @@
 
 ## Interface policy
 
-Internal web mutations call application commands through server actions. Route handlers are used for webhooks, explicitly versioned HTTP APIs, and cacheable external reads; they validate input, authenticate callers, authorize resources, set safe errors, and never expose internal aggregate serialization.
+Internal web mutations call application commands through server actions. Route handlers are used for webhooks, explicitly versioned HTTP APIs, and cacheable external reads, and they validate input, authenticate callers, authorize resources, set safe errors, and never expose internal aggregate serialization.
 
 ## Required interface controls
 
