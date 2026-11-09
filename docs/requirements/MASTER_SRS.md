@@ -10,9 +10,9 @@
 
 ## 1. Authority and purpose
 
-Lex Gate is an integrated legal-practice environment for an Egyptian law firm. It supports a future public presence, controlled client intake, legal operations, records, finance, and carefully governed integrations without treating legal work as ordinary CRUD.
+Lex Gate is an integrated legal-practice environment for an Egyptian law firm. It covers a future public presence, controlled client intake, legal operations, records, finance, and carefully governed integrations without treating legal work as ordinary CRUD.
 
-This SRS is the canonical implementation specification. It is read with the machine-readable requirement records in this directory and the validation register. Archived documents provide source rationale only. A contradiction must be escalated according to `LG-GOV-001`.
+This SRS is the canonical implementation specification. It is read with the machine-readable requirement records in this directory and the validation register. Archived documents give source rationale only. A contradiction must be escalated according to `LG-GOV-001`.
 
 ## 2. Product boundary
 
@@ -55,11 +55,11 @@ The platform shall distinguish persons, organizations, aliases, representatives,
 
 ### Matter, proceeding, deadlines, and work
 
-Material state changes are explicit domain commands with authorization, prerequisites, evidence, audit, and idempotency. Legal rules are source-linked, effective-dated, and versioned; calculations remain provisional until the required reviewer confirms them.
+Material state changes are explicit domain commands with authorization, prerequisites, evidence, audit, and idempotency. Legal rules are source-linked, effective-dated, and versioned, and calculations remain provisional until the required reviewer confirms them.
 
 ### Documents, evidence, and records
 
-The platform shall preserve immutable file identity, versioned documents, review state, publication state, derivative provenance, evidence custody, retention policy, legal hold, and controlled destruction. Confidential files use private storage; public URLs are prohibited for confidential material.
+The platform shall preserve immutable file identity, versioned documents, review state, publication state, derivative provenance, evidence custody, retention policy, legal hold, and controlled destruction. Confidential files use private storage, public URLs are prohibited for confidential material.
 
 ### Client communication and portal
 
@@ -79,11 +79,11 @@ The platform shall use privacy by design, data minimization, purpose and retenti
 - Use a relational ACID database as canonical state, private object storage for files, and a transactional outbox for side effects.
 - Use explicit commands for material state transitions and client projections for the portal.
 - Maintain Arabic/RTL as a first-class product requirement, including mixed Arabic/Latin content, accessible focus, and semantic language/direction attributes.
-- Default Next.js application routes to the Node runtime. Server Components load internal reads; Server Actions handle internal mutations; route handlers are reserved for webhooks and HTTP APIs.
+- Default Next.js application routes to the Node runtime. Server Components load internal reads, Server Actions handle internal mutations, and route handlers are reserved for webhooks and HTTP APIs.
 
 ## 6. Quality attributes
 
-Every release must be traceable to requirements, contain deterministic tests, use synthetic data, protect privacy/security boundaries, provide actionable observability, and document any manual fallback. Test selection is risk-based and every omitted layer requires a recorded rationale; an implementer who cannot meet the bar must narrow scope or block work rather than lower this standard. P0 controls require negative-path tests and independent review evidence. No test may be deleted or weakened solely to obtain a green pipeline.
+Every release must be traceable to requirements, contain deterministic tests, use synthetic data, protect privacy/security boundaries, provide actionable observability, and document any manual fallback. Test selection is risk-based and every omitted layer requires a recorded rationale, an implementer who cannot meet the bar must narrow scope or block work rather than lower this standard. P0 controls require negative-path tests and independent review evidence. No test may be deleted or weakened solely to obtain a green pipeline.
 
 ## 7. Requirements lifecycle
 
@@ -104,4 +104,4 @@ Canonical requirements are stored in `requirements.yaml`. Each has source, statu
 
 ## 9. Explicit exclusions for M0
 
-M0 does not include a public legal-service launch, real authentication, matter data, conflict results, procedural calculation, legal opinion, file uploads, client information, invoice generation, provider credentials, court data acquisition, or AI prompts. Its purpose is to make later work safe, testable, and reviewable.
+M0 does not include a public legal-service launch, real authentication, matter data, conflict results, procedural calculation, legal opinion, file uploads, client information, invoice generation, provider credentials, court data acquisition, or AI prompts. The point of it is to make later work safe, testable, and reviewable.
